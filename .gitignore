@@ -1,0 +1,7 @@
+.svn/*
+target/*
+tmp/*
+*.class
+test/projects/demo/target/*
+web-app/images
+web-app/js
