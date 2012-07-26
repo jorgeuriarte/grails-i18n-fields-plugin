@@ -1,0 +1,22 @@
+
+h1. withLocale
+
+h2. Purpose
+
+
+
+h2. Examples
+
+{code:java}
+foo.withLocale(locale,closure)
+{code}
+
+h2. Description
+
+
+
+Arguments:
+
+[* @locale@
+, * @closure@
+]
