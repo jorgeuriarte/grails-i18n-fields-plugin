@@ -5,3 +5,6 @@ tmp/*
 test/projects/demo/target/*
 web-app/images
 web-app/js
+stacktrace.log
+grails-i18n-fields-*.zip
+plugin.xml
