@@ -9,9 +9,6 @@
     <resource>i18nfields.TestController</resource>
     <resource>i18nfields.Ego</resource>
     <resource>i18nfields.Literal</resource>
-    <resource>i18nfields.LiteralService</resource>
-    <resource>i18nfields.TestService</resource>
-    <resource>i18nfields.TestTagLib</resource>
   </resources>
   <repositories>
     <repository name='grailsCentral' url='http://plugins.grails.org' />
