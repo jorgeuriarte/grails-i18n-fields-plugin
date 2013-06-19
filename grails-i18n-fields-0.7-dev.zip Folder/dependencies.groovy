@@ -27,15 +27,10 @@ grails.project.dependency.resolution = {
         runtime 'redis.clients:jedis:2.0.0'
     }
     plugins {
-	build (":release:2.2.1", ":rest-client-builder:1.0.3") {
-		export = false
-	}
         compile (":springcache:1.3.1") {
           export = false
         }
-		compile (":yammer-metrics:2.1.2-1")
-        runtime (":yammer-metrics:2.1.2-1") {
-          excludes([ group: 'org.slf4j', name: 'slf4j-api', version: '1.6.4']) 
+        runtime (":yammer-metrics:0.2-dev") {
           export = true
         }
     }    
