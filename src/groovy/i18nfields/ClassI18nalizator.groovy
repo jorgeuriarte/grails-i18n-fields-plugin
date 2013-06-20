@@ -25,11 +25,13 @@ import org.codehaus.groovy.ast.PropertyNode
 class ClassI18nalizator {
 	def classNode
 	def locales
+	def redisLocales
 	def literalTable
 
-	ClassI18nalizator(ClassNode classNode, Collection<Locale> locales) {
+	ClassI18nalizator(ClassNode classNode, Collection<Locale> locales, Collection<Locale> redisLocales) {
 		this.classNode = classNode
 		this.locales = locales
+		this.redisLocales = redisLocales
 	}
 
 	void transformClass() {
@@ -41,6 +43,8 @@ class ClassI18nalizator {
 	private void configureTransformation() {
 		checkForDeprecatedConfiguration()
 		addLocalesMap()
+		addRedisLocalesList()
+		addLocalesCache()
 		chooseLiteralTable()		
 	}
 
@@ -82,6 +86,27 @@ class ClassI18nalizator {
 		}
 		addStaticField(I18nFields.LOCALES, i18nFields)
 	}
+	
+	/**
+	 * Add a list with the locales to be managed in redis
+	 * @return
+	 */
+	private addRedisLocalesList() {
+		def redisLocalesListExpression = new ListExpression()
+		redisLocales.each { locale ->
+			redisLocalesListExpression.addExpression(new ConstantExpression(locale.toString()))
+		}
+		addStaticField(I18nFields.REDIS_LOCALES, redisLocalesListExpression)
+	}
+	
+	/**
+	 * Add map to hold cahed values from redis
+	 * @return
+	 */
+	private addLocalesCache() {
+		def valuesCacheField = new MapExpression()
+		addField("valuesCache", valuesCacheField);
+	}
 
 	private addTempStringMap() {
         classNode.addField(new FieldNode(I18nFields.TEMPSTRINGS, ACC_PUBLIC,
@@ -116,6 +141,15 @@ class ClassI18nalizator {
 		println "[i18nFields] Adding ${name} static field to ${classNode.name}"
 		field.setDeclaringClass(classNode)
 		classNode.addField(field)
+	}
+	
+	private addField(name, initialExpression) {
+		def field = new FieldNode(name, ACC_PUBLIC, new ClassNode(Object.class), classNode, initialExpression)
+		// TODO: Use log4j
+		println "[i18nFields] Adding ${name} field to ${classNode.name}"
+		field.setDeclaringClass(classNode)
+		classNode.addField(field)
+
 	}
 
 	private getI18nFieldList() {

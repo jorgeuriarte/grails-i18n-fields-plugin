@@ -92,4 +92,5 @@ log4j = {
 
 i18nFields {
         locales = ["es_ES", "en_US", "pt_BR", "fr_FR"]
+		redisLocales = ["en_US"]
 }

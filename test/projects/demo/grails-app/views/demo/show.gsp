@@ -14,6 +14,7 @@
 				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 				<li><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 				<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
+				<g:render template="/localeChanger"/>
 			</ul>
 		</div>
 		<div id="show-demo" class="content scaffold-show" role="main">
@@ -30,6 +31,10 @@
 				</li>
 				</g:if>
 			
+				<li class="fieldcontain">
+					<span id="name-label" class="property-label"><g:message code="demo.name.label" default="Name" /></span>
+					<span class="property-value" aria-labelledby="name-label">${demoInstance.fetched() }</span>
+				</li>
 			
 				<g:if test="${demoInstance?.name_es_ES}">
 				<li class="fieldcontain">

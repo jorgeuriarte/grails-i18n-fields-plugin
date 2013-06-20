@@ -26,6 +26,7 @@ class I18nFieldsGrailsPlugin {
 			"web-app/js/*",
 			"web-app/js/prototype/*",
 	]
+	def dependsOn = [:]
 
 	def config = ConfigurationHolder.config
 

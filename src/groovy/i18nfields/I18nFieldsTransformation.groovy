@@ -21,7 +21,7 @@ public class I18nFieldsTransformation implements ASTTransformation {
 		if (!isValidAstNodes(astNodes))
 			return
 		checkForDeprecatedConfiguration()
-		ClassI18nalizator internationalizator = new ClassI18nalizator(astNodes[1], locales())
+		ClassI18nalizator internationalizator = new ClassI18nalizator(astNodes[1], locales(), redisLocales())
 		internationalizator.transformClass()
 	}
 
@@ -42,12 +42,24 @@ public class I18nFieldsTransformation implements ASTTransformation {
 		filterInvalidLocales(configuredLocales).each { locales << getLocale(it) }
 		return locales
 	}
+	
+	private redisLocales() {
+		def locales = []
+		filterInvalidLocales(configuredRedisLocales).each { locales << getLocale(it) }
+		return locales
+	}
 
 	private getConfiguredLocales() {
 		if (null != pluginConfig."${I18nFields.I18N_FIELDS}"?."${I18nFields.LOCALES}")
 			return pluginConfig."${I18nFields.I18N_FIELDS}"."${I18nFields.LOCALES}"
 		if (null != pluginConfig."${I18nFields.I18N_FIELDS}"?."${I18nFields.DEPRECATED_LOCALES}")
 			return pluginConfig."${I18nFields.I18N_FIELDS}"."${I18nFields.DEPRECATED_LOCALES}"
+		return [:]
+	}
+	
+	private getConfiguredRedisLocales() {
+		if(pluginConfig."${I18nFields.I18N_FIELDS}"?."${I18nFields.REDIS_LOCALES}")
+			return pluginConfig."${I18nFields.I18N_FIELDS}"?."${I18nFields.REDIS_LOCALES}"
 		return [:]
 	}
 
