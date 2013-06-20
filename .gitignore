@@ -5,3 +5,5 @@ tmp/*
 test/projects/demo/target/*
 web-app/images
 web-app/js
+.settings
+target-eclipse

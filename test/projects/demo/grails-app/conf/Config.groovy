@@ -91,5 +91,5 @@ log4j = {
 }
 
 i18nFields {
-        locales = ["es_ES", "pt_BR", "fr_FR"]
+        locales = ["es_ES", "en_US", "pt_BR", "fr_FR"]
 }
