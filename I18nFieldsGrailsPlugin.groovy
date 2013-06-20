@@ -11,7 +11,6 @@ class I18nFieldsGrailsPlugin {
 
 	def version = "0.7.2-SNAPSHOT"
 	def grailsVersion = "1.3 > *"
-	def dependsOn = ['yammer-metrics':'2.1.2-1']
 	def pluginExcludes = [
 			"lib/*",
 			"grails-app/i18n/*",

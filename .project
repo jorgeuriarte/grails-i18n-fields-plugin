@@ -5,8 +5,24 @@
 	<projects>
 	</projects>
 	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.grails.ide.eclipse.core.nature</nature>
+		<nature>org.eclipse.jdt.groovy.core.groovyNature</nature>
 		<nature>com.aptana.projects.webnature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>.link_to_grails_plugins</name>
+			<type>2</type>
+			<locationURI>GRAILS_ROOT/2.2.1/projects/i18n-fields/plugins</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

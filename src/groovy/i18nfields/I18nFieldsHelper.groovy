@@ -91,30 +91,26 @@ class I18nFieldsHelper implements Serializable {
 	}
 
 	def loadFieldsLocallyFromDB(locale, object) {
-		(new com.yammer.metrics.groovy.Timer(object.class, 'loadFieldsLocallyFromDB')).time {
-			def raiz = object?."${I18nFields.TEMPSTRINGS}"
-			if (!raiz?."${locale}")
-				raiz[locale.toString()] = [:]
+		def raiz = object?."${I18nFields.TEMPSTRINGS}"
+		if (!raiz?."${locale}")
+			raiz[locale.toString()] = [:]
 
-			def c = Literal.createCriteria()
-			c.list {
-				eq("myclass", object.class.name)
-				eq("myobject", object?.id)
-				eq("locale", locale.toString())
-			}.each { field ->
-				raiz[locale.toString()][field.field] = field.value
-			}
-			cachePut("${object.class.name}:${object.id}:${locale}", raiz[locale.toString()])
+		def c = Literal.createCriteria()
+		c.list {
+			eq("myclass", object.class.name)
+			eq("myobject", object?.id)
+			eq("locale", locale.toString())
+		}.each { field ->
+			raiz[locale.toString()][field.field] = field.value
 		}
+		cachePut("${object.class.name}:${object.id}:${locale}", raiz[locale.toString()])
 	}
 
 	def loadFieldsLocallyFromRedis(locale, object) {
 		println "Getting from redis! (${object?.id}:${locale.toString()})"
 		def raiz = object?."${I18nFields.TEMPSTRINGS}"
-		(new com.yammer.metrics.groovy.Timer(object.class, 'loadFieldsLocallyFromRedis')).time {
-			raiz[locale.toString()] = redis.hgetAll("literal:${object.class.name}:${object?.id}:${locale.toString()}")
-			cachePut("${object.class.name}:${object.id}:${locale}", raiz[locale.toString()])
-		}
+		raiz[locale.toString()] = redis.hgetAll("literal:${object.class.name}:${object?.id}:${locale.toString()}")
+		cachePut("${object.class.name}:${object.id}:${locale}", raiz[locale.toString()])
 	}
 
 	def acceptedLocale(locale, object) {

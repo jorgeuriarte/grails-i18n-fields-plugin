@@ -325,8 +325,7 @@ class ClassI18nalizator {
 	private localizedNamedGetterCode = { field, locale ->
 		"""
 def locale = new Locale('${locale.language}', '${locale.country}')
-def fieldValue
-useTimer('${classNode.name}.${field}') { fieldValue = ${getterCode(field)} }
+def fieldValue = ${getterCode(field)}
 return fieldValue
 """
 	}
@@ -344,8 +343,7 @@ def locale = org.springframework.context.i18n.LocaleContextHolder.getLocale()
 if (${I18nFields.LOCALES}.containsKey(locale.language) && !${I18nFields.LOCALES}[locale.language].contains(locale.country)) {
 	locale = new Locale(locale.language)
 }
-def fieldValue
-useTimer('${classNode.name}.${field}') { fieldValue = ${getterCode(field)} }
+def fieldValue = ${getterCode(field)}
 return fieldValue
 """
 	}
@@ -364,8 +362,7 @@ println "I am inside a localizedGetterCode for '${field}'"
 if (${I18nFields.LOCALES}.containsKey(locale.language) && !${I18nFields.LOCALES}[locale.language].contains(locale.country)) {
 	locale = new Locale(locale.language)	
 }
-def fieldValue
-useTimer('${classNode.name}.${field}') { fieldValue = ${getterCode(field)} }
+def fieldValue = ${getterCode(field)}
 return fieldValue
 """
 	}
