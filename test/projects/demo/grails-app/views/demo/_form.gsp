@@ -8,6 +8,7 @@
 	<g:textField name="name_es_ES" value="${demoInstance?.name_es_ES}"/>
 </div>
 
+<%--
 <div class="fieldcontain ${hasErrors(bean: demoInstance, field: 'name_en_US', 'error')} ">
 	<label for="name_en_US">
 		<g:message code="demo.name_en_US.label" default="Nameen US" />
@@ -15,7 +16,8 @@
 	</label>
 	<g:textField name="name_en_US" value="${demoInstance?.name_en_US}"/>
 </div>
-
+ --%>
+  
 <div class="fieldcontain ${hasErrors(bean: demoInstance, field: 'name_pt_BR', 'error')} ">
 	<label for="name_pt_BR">
 		<g:message code="demo.name_pt_BR.label" default="Namept BR" />

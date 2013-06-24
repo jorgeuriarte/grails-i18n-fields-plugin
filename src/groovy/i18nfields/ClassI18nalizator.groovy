@@ -202,10 +202,13 @@ class ClassI18nalizator {
 	private addI18nFields(baseName) {
 		if (!literalTable) {
 			locales.each { locale ->
-				def fieldName = "${baseName}_${locale}"
-				addI18nField(fieldName)
-				if (!hasConstraints(fieldName) && hasConstraints(baseName))
-					copyConstraints(baseName, fieldName)
+				// if locale is redis-based, do not create a real field.
+				if(!redisLocales.contains(locale)) {
+					def fieldName = "${baseName}_${locale}"
+					addI18nField(fieldName)
+					if (!hasConstraints(fieldName) && hasConstraints(baseName))
+						copyConstraints(baseName, fieldName)
+				}
 			}
 		}
 	}
@@ -414,7 +417,7 @@ ${setterCode(field)}
 		if (literalTable) {
 			"this.i18nFieldsHelper.findFieldFor(\"${getColumnName(field)}\", locale, this)"
 		} else {
-			"redisBridgeService.getLocalizedValue(this, '${field}')"
+			"this.i18nFieldsHelper.getLocalizedValue(this, '${field}')"
 		}
 	}
 
