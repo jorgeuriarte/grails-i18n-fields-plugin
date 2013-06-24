@@ -24,16 +24,9 @@
 			</g:if>
 			<ol class="property-list demo">
 			
-				<g:if test="${demoInstance?.name}">
 				<li class="fieldcontain">
-					<span id="name-label" class="property-label"><g:message code="demo.name.label" default="Name" /></span>
+					<span id="name-label" class="property-label">Name directo</span>
 					<span class="property-value" aria-labelledby="name-label"><g:fieldValue bean="${demoInstance}" field="name"/></span>
-				</li>
-				</g:if>
-			
-				<li class="fieldcontain">
-					<span id="name-label" class="property-label"><g:message code="demo.name.label" default="Name" /></span>
-					<span class="property-value" aria-labelledby="name-label">${demoInstance.fetched() }</span>
 				</li>
 			
 				<g:if test="${demoInstance?.name_es_ES}">

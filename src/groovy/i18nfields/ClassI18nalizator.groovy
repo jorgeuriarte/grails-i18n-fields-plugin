@@ -414,7 +414,7 @@ ${setterCode(field)}
 		if (literalTable) {
 			"this.i18nFieldsHelper.findFieldFor(\"${getColumnName(field)}\", locale, this)"
 		} else {
-			"this.\"${field}_\${locale}\""
+			"redisBridgeService.getLocalizedValue(this, '${field}')"
 		}
 	}
 

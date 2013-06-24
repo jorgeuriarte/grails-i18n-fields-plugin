@@ -14,7 +14,6 @@ class Demo {
 	def fetched() {
 		def locale = i18nfields.I18nFieldsHelper.getLocale()
 		redisBridgeService.populateCache(this, locale)
-		redisBridgeService.populateCache(this, locale)
 		return valuesCache[locale.toString()].name 
 	}
 }

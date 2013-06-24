@@ -4,6 +4,26 @@ class RedisBridgeService {
     static transactional = false
 	
 	/**
+	 * Return a field value
+	 * @param object
+	 * @param field
+	 * @return
+	 */
+	def getLocalizedValue( object, field ) {
+		// If current locale is on readis, load cache and then retrieve value
+		// if it is not, then use the field as field_${locale}
+		def locale = i18nfields.I18nFieldsHelper.getLocale()
+		def isRedisLocale =  object[I18nFields.REDIS_LOCALES].contains(locale.toString())
+		
+		if(!isRedisLocale) return object["${field}_${locale}"]
+		else {
+			this.populateCache(object, locale)
+			return object.valuesCache[locale.toString()].name
+		}
+	}
+	
+	
+	/**
 	 * Retrieve from redis the values for a object
 	 * 
 	 * @param object object which values will be fetched
