@@ -1,13 +1,14 @@
 package i18nfields
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.springframework.context.ApplicationContext
 import org.springframework.context.i18n.LocaleContextHolder
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import net.sf.ehcache.*
+import groovy.util.logging.*
 
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 
+@Log4j()
 class I18nFieldsHelper implements Serializable {
 	transient def redis = new redis.clients.jedis.Jedis("localhost")
 
@@ -189,6 +190,8 @@ class I18nFieldsHelper implements Serializable {
 	 * @return
 	 */
 	def getLocalizedValue( object, field ) {
+		assert object != null, "object to retrieve value should never be null"
+		
 		// If current locale is on readis, load cache and then retrieve value
 		// if it is not, then use the field as field_${locale}
 		def locale = i18nfields.I18nFieldsHelper.getLocale()
@@ -196,8 +199,23 @@ class I18nFieldsHelper implements Serializable {
 		
 		if(!isRedisLocale) return object["${field}_${locale}"]
 		else {
-			this.populateCache(object, locale)
-			return object.valuesCache[locale.toString()].name
+			def result = ""
+			try {
+				this.populateCache(object, locale)
+				result = object.valuesCache[locale.toString()].name
+			}
+			catch(Exception e) {
+				log.error("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
+				
+				// If something goes wrong, use default language if avaible, otherwise return empty string.
+				// default language should be a gorm language.
+				def grailsApplication = getSpringBean("grailsApplication")
+				def default_locale = grailsApplication.config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
+				if(default_locale) {
+					result = object["${field}_${default_locale}"]
+				} 
+			}
+			return result;
 		}
 	}
 	
@@ -213,6 +231,7 @@ class I18nFieldsHelper implements Serializable {
 		def className = object.class.simpleName.toLowerCase()
 		
 		def keyName = "${locale}:${className}:${objectId}"
+		
 		return redis.hgetAll(keyName)
 	}
 	
@@ -227,6 +246,10 @@ class I18nFieldsHelper implements Serializable {
 
 		def values = fetch(object, locale)
 		object.valuesCache[locale.toString()] = values
+	}
+	
+	static getSpringBean(String name) {
+		SCH.getServletContext().getAttribute(GA.APPLICATION_CONTEXT).getBean(name);
 	}
 
 }

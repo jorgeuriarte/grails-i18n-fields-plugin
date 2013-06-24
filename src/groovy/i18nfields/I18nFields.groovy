@@ -23,5 +23,6 @@ public @interface I18nFields {
 	static final String I18N_FIELDS_TABLE_LITERAL= "literal"
 	static final String TEMPSTRINGS = "i18nFieldsTempStrings"
     static final String CACHESTRINGS = "i18nFieldsCacheStrings"
+	static final String DEFAULT_LOCALE = "defaultLocale"
 }
 
