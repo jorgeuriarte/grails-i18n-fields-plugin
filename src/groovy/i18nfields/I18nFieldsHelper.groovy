@@ -23,6 +23,15 @@ class I18nFieldsHelper implements Serializable {
 	static getLocale() {
 		return LocaleContextHolder.getLocale()
 	}
+	
+	static getSupportedLocale(object) {
+	    def locale = getLocale()
+	    if (object."${I18nFields.LOCALES}".containsKey(locale.language) && !object."${I18nFields.LOCALES}"[locale.language].contains(locale.country)) {
+            locale = new Locale(locale.language)
+        }
+        
+        return locale
+	}
 
 	static withLocale = { Locale newLocale, Closure closure ->
 		def previousLocale = i18nfields.I18nFieldsHelper.getLocale()
@@ -194,7 +203,7 @@ class I18nFieldsHelper implements Serializable {
 		
 		// If current locale is on readis, load cache and then retrieve value
 		// if it is not, then use the field as field_${locale}
-		def locale = i18nfields.I18nFieldsHelper.getLocale()
+		def locale = i18nfields.I18nFieldsHelper.getSupportedLocale(object)
 		def isRedisLocale =  object[I18nFields.REDIS_LOCALES].contains(locale.toString())
 		
 		if(!isRedisLocale) return object["${field}_${locale}"]
