@@ -211,7 +211,7 @@ class I18nFieldsHelper implements Serializable {
 			def result = ""
 			try {
 				this.populateCache(object, locale)
-				result = object.valuesCache[locale.toString()].name
+				result = object.valuesCache[locale.toString()][field]
 			}
 			catch(Exception e) {
 				log.error("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
