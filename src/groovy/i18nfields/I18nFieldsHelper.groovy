@@ -211,7 +211,9 @@ class I18nFieldsHelper implements Serializable {
 			def result = ""
 			try {
 				this.populateCache(object, locale)
-				result = object.valuesCache[locale.toString()][field]
+				
+				def redisField = translateField(object, field)
+				result = object.valuesCache[locale.toString()][redisField]
 			}
 			catch(Exception e) {
 				log.error("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
@@ -226,6 +228,18 @@ class I18nFieldsHelper implements Serializable {
 			}
 			return result;
 		}
+	}
+	
+	/**
+	 * Transforms the field name to the redis field name.
+	 * @param field field to adapt.
+	 * @return name of the hash field to be used in redis
+	 */
+	def translateField(object, field) {
+		if(!object[I18nFields.I18N_FIELDS_RENAME]) return field
+		
+		def redisField = object[I18nFields.I18N_FIELDS_RENAME][field]?:field
+		return redisField
 	}
 	
 	/**

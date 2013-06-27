@@ -25,10 +25,15 @@
 			<ol class="property-list demo">
 			
 				<li class="fieldcontain">
-					<span id="name-label" class="property-label">Name directo</span>
+					<span id="name-label" class="property-label">Name</span>
 					<span class="property-value" aria-labelledby="name-label"><g:fieldValue bean="${demoInstance}" field="name"/></span>
 				</li>
-			
+
+				<li class="fieldcontain">
+					<span id="name-label" class="property-label">Description</span>
+					<span class="property-value" aria-labelledby="name-label"><g:fieldValue bean="${demoInstance}" field="description"/></span>
+				</li>
+							
 				<g:if test="${demoInstance?.name_es_ES}">
 				<li class="fieldcontain">
 					<span id="name_es_ES-label" class="property-label"><g:message code="demo.name_es_ES.label" default="Namees ES" /></span>

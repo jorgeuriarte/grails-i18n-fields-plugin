@@ -24,5 +24,6 @@ public @interface I18nFields {
 	static final String TEMPSTRINGS = "i18nFieldsTempStrings"
     static final String CACHESTRINGS = "i18nFieldsCacheStrings"
 	static final String DEFAULT_LOCALE = "defaultLocale"
+	static final String I18N_FIELDS_RENAME = "i18nFieldsRename"
 }
 
