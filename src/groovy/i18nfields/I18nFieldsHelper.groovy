@@ -216,7 +216,7 @@ class I18nFieldsHelper implements Serializable {
 				result = object.valuesCache[locale.toString()][redisField]
 			}
 			catch(Exception e) {
-				log.error("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
+				log.warn("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
 				
 				// If something goes wrong, use default language if avaible, otherwise return empty string.
 				// default language should be a gorm language.
@@ -236,7 +236,7 @@ class I18nFieldsHelper implements Serializable {
 	 * @return name of the hash field to be used in redis
 	 */
 	def translateField(object, field) {
-		if(!object[I18nFields.I18N_FIELDS_RENAME]) return field
+		if(!object.metaClass.hasProperty(object, I18nFields.I18N_FIELDS_RENAME)) return field
 		
 		def redisField = object[I18nFields.I18N_FIELDS_RENAME][field]?:field
 		return redisField
@@ -268,6 +268,7 @@ class I18nFieldsHelper implements Serializable {
 		if(object.valuesCache[locale.toString()]) return;
 
 		def values = fetch(object, locale)
+		if(!values) throw new Exception("Redis value not found.")
 		object.valuesCache[locale.toString()] = values
 	}
 	
