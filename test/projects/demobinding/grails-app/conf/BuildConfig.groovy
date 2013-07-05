@@ -42,6 +42,7 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
 
         // runtime 'mysql:mysql-connector-java:5.1.22'
+        runtime 'redis.clients:jedis:2.0.0'
     }
 
     plugins {
@@ -61,3 +62,4 @@ grails.project.dependency.resolution = {
         compile ':cache:1.0.1'
     }
 }
+grails.plugin.location.'i18n-fields'="../../../"

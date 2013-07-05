@@ -89,3 +89,14 @@ log4j = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 }
+
+i18nFields {
+    // Which locales do we know
+    locales = ["es_ES", "en_US", "fr_FR"]
+
+    // Of the known locales, which locales should be stored in redis
+    redisLocales = ["en_US", "fr_FR"]
+
+    // If can not fetch a locale from redis, which non-redis locale should we use
+    defaultLocale = "es_ES"
+}

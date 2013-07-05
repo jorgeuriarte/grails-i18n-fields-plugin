@@ -24,12 +24,12 @@ grails.project.dependency.resolution = {
         compile("net.sf.ehcache:ehcache-web:2.0.3") {
                excludes "ehcache-core", "xml-apis" // ehcache-core is provided by Grails
         }
-        runtime 'redis.clients:jedis:2.0.0'
+        compile 'redis.clients:jedis:2.0.0'
     }
 	plugins {
 		build (":release:2.2.1", ":rest-client-builder:1.0.3") { export = false }
 		compile (":springcache:1.3.1") { export = false }
-		runtime ":redis:1.3.1"
+		compile ":redis:1.3.1"
 	}
 }
 

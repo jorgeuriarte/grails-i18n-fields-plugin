@@ -22,6 +22,9 @@ class DemoController {
     def save() {
         def demoInstance = new Demo(params)
         println "${params.name_en_US} - ${demoInstance.name_en_US}"
+        println demoInstance.transients
+        println demoInstance.constraints
+        
         if (!demoInstance.save(flush: true)) {
             render(view: "create", model: [demoInstance: demoInstance])
             return

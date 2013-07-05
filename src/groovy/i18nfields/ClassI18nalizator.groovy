@@ -26,7 +26,6 @@ class ClassI18nalizator {
 	def classNode
 	def locales
 	def redisLocales
-	def literalTable
 
 	ClassI18nalizator(ClassNode classNode, Collection<Locale> locales, Collection<Locale> redisLocales) {
 		this.classNode = classNode
@@ -41,18 +40,12 @@ class ClassI18nalizator {
 	}
 
 	private void configureTransformation() {
-		checkForDeprecatedConfiguration()
 		addLocalesMap()
 		addRedisLocalesList()
 		addLocalesCache()
-		chooseLiteralTable()		
 	}
 
 	private void createLocalStructures() {
-		if (literalTable) {
-			addTempStringMap()
-			addLocalCacheMap()
-		}
 		addHelper()
 	}
 
@@ -64,12 +57,6 @@ class ClassI18nalizator {
 			addGettersAndSetters(fieldName)
 			removeConstraintsFor(fieldName)
 		}
-	}
-
-	// TODO: Use log4j
-	private checkForDeprecatedConfiguration() {
-		if (fieldExists(I18nFields.DEPRECATED_I18N_FIELDS))
-			println "[i18nFields] WARNING - ${classNode.name} is using a deprecated i18n field list definition (i18n_fields). Change it for 'i18nFields' as soon as possible"
 	}
 
 	private addLocalesMap() {
@@ -127,14 +114,6 @@ class ClassI18nalizator {
 								new ConstructorCallExpression(new ClassNode(I18nFieldsHelper.class), MethodCallExpression.NO_ARGUMENTS)))
 	}
 
-	private chooseLiteralTable() {
-		if (fieldExists(I18nFields.I18N_FIELDS_TABLE)) {
-			literalTable = I18nFields.I18N_FIELDS_TABLE_LITERAL
-		} else {
-			literalTable = null
-		}
-	}
-
 	private addStaticField(name, initialExpression) {
 		def field = new FieldNode(name, ACC_PUBLIC | ACC_STATIC, new ClassNode(Object.class), classNode, initialExpression)
 		// TODO: Use log4j
@@ -167,8 +146,7 @@ class ClassI18nalizator {
 	private getI18nFieldListConfigurationField() {
 		if (fieldExists(I18nFields.I18N_FIELDS))
 			return classNode.getField(I18nFields.I18N_FIELDS)
-		if (fieldExists(I18nFields.DEPRECATED_I18N_FIELDS))
-			return classNode.getField(I18nFields.DEPRECATED_I18N_FIELDS)
+
 		// TODO: Use log4j
 		println "[i18nFields] WARNING - Visted ${classNode.name} but no ${I18nFields.I18N_FIELDS} static property found"
 	}
@@ -200,25 +178,19 @@ class ClassI18nalizator {
 	}
 
 	private addI18nFields(baseName) {
-		if (!literalTable) {
-			locales.each { locale ->
-				// if locale is redis-based, do not create a real field.
-				if(!redisLocales.contains(locale)) {
-					def fieldName = "${baseName}_${locale}"
-					addI18nField(fieldName)
-					if (!hasConstraints(fieldName) && hasConstraints(baseName))
-						copyConstraints(baseName, fieldName)
-				}
-			}
-		}
+	    locales.each { locale ->
+	        // TODO: if(!redisLocales.contains(locale)) {
+	        // Redis locales should be created transients
+		    def fieldName = "${baseName}_${locale}"
+		    addI18nField(fieldName)
+		    if (!hasConstraints(fieldName) && hasConstraints(baseName))
+			    copyConstraints(baseName, fieldName)
+	    }
 	}
 
 	private addI18nField(name) {
-		if (!literalTable) {
-			// TODO: Use log4j
-			println "[i18nFields] Adding '${name}' field to ${classNode.name}"
-			classNode.addProperty(name, Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), null, null)
-		}
+		println "[i18nFields] Adding '${name}' field to ${classNode.name}"
+		classNode.addProperty(name, Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), null, null)
 	}
 
 	private boolean hasConstraints(field) {
@@ -284,10 +256,6 @@ class ClassI18nalizator {
 	private addLocalizedGetterAndSetter(field) {
 		addLocalizedGetter(field)
 		addLocalizedSetter(field)
-		if (literalTable) {
-			addLocalizedNamedGetters(field)
-			addLocalizedNamedSetters(field)
-		}
 	}
 
 	private addProxyGetter(field) {
@@ -414,23 +382,11 @@ ${setterCode(field)}
 	}
 
 	private getterCode = { field ->
-		if (literalTable) {
-			"this.i18nFieldsHelper.findFieldFor(\"${getColumnName(field)}\", locale, this)"
-		} else {
-			"this.i18nFieldsHelper.getLocalizedValue(this, '${field}')"
-		}
+		"this.i18nFieldsHelper.getLocalizedValue(this, '${field}')"
 	}
 
 	private setterCode = { field ->
-		if (literalTable) {
-			"""
-this.i18nFieldsHelper.setFieldFor(\"${getColumnName(field)}\", locale.toString(), this, value)
-"""
-		} else {
-			"""
-this.\"${field}_\${locale}\" = value
-"""
-		}
+        "this.\"${field}_\${locale}\" = value"
 	}
 
 	private getColumnName(field) {
