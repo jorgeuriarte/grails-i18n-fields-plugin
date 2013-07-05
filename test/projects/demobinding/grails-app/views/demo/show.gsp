@@ -22,7 +22,16 @@
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>
 			<ol class="property-list demo">
-			
+			<%--
+				<g:if test="${demoInstance?.name}">
+				<li class="fieldcontain">
+					<span id="name-label" class="property-label"><g:message code="demo.name.label" default="Name" /></span>
+					
+						<span class="property-value" aria-labelledby="name-label"><g:fieldValue bean="${demoInstance}" field="name"/></span>
+					
+				</li>
+				</g:if>
+			--%>
 				<g:if test="${demoInstance?.name_en_US}">
 				<li class="fieldcontain">
 					<span id="name_en_US-label" class="property-label"><g:message code="demo.name_en_US.label" default="Nameen US" /></span>
@@ -37,15 +46,6 @@
 					<span id="name_fr_FR-label" class="property-label"><g:message code="demo.name_fr_FR.label" default="Namefr FR" /></span>
 					
 						<span class="property-value" aria-labelledby="name_fr_FR-label"><g:fieldValue bean="${demoInstance}" field="name_fr_FR"/></span>
-					
-				</li>
-				</g:if>
-			
-				<g:if test="${demoInstance?.name}">
-				<li class="fieldcontain">
-					<span id="name-label" class="property-label"><g:message code="demo.name.label" default="Name" /></span>
-					
-						<span class="property-value" aria-labelledby="name-label"><g:fieldValue bean="${demoInstance}" field="name"/></span>
 					
 				</li>
 				</g:if>

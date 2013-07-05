@@ -10,7 +10,7 @@ import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
 
 @Log4j()
 class I18nFieldsHelper implements Serializable {
-	transient def redis = new redis.clients.jedis.Jedis("localhost")
+	transient static def redis = new redis.clients.jedis.Jedis("localhost")
 
 	transient def cacheLiterales
 
@@ -20,14 +20,21 @@ class I18nFieldsHelper implements Serializable {
 		LocaleContextHolder.setLocale(locale)
 	}
 
+    /**
+     * Gets current locale
+     */
 	static getLocale() {
 		return LocaleContextHolder.getLocale()
 	}
-	
-	static getSupportedLocale(object) {
+    
+    /**
+     * Gets the locale to be used
+     */
+	static getSupportedLocale() {
 	    def locale = getLocale()
-	    if (object."${I18nFields.LOCALES}".containsKey(locale.language) && !object."${I18nFields.LOCALES}"[locale.language].contains(locale.country)) {
-            locale = new Locale(locale.language)
+		def locales = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.LOCALES]
+	    if (!locales.contains(locale.toString())) {
+            throw new Exception("Locale ${locale} not found!")
         }
         
         return locale
@@ -193,27 +200,27 @@ class I18nFieldsHelper implements Serializable {
     }
 	
 	/**
-	 * Return a field value
-	 * @param object
+	 * Return the field value for the current locale.
+	 * 
+	 * @param object domain class instance being used.
 	 * @param field
 	 * @return
 	 */
-	def getLocalizedValue( object, field ) {
+	static String getLocalizedValue( object, field ) {
 		assert object != null, "object to retrieve value should never be null"
 		
 		// If current locale is on readis, load cache and then retrieve value
 		// if it is not, then use the field as field_${locale}
-		def locale = i18nfields.I18nFieldsHelper.getSupportedLocale(object)
-		def isRedisLocale =  object[I18nFields.REDIS_LOCALES].contains(locale.toString())
+		def locale = i18nfields.I18nFieldsHelper.getSupportedLocale()
+		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale.toString())
 		
 		if(!isRedisLocale) return object["${field}_${locale}"]
 		else {
 			def result = ""
 			try {
-				this.populateCache(object, locale)
+				populateCache(object, locale)
 				
-				def redisField = translateField(object, field)
-				result = object.valuesCache[locale.toString()][redisField]
+				result = object["${field}_${locale}"]
 			}
 			catch(Exception e) {
 				log.warn("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
@@ -235,7 +242,7 @@ class I18nFieldsHelper implements Serializable {
 	 * @param field field to adapt.
 	 * @return name of the hash field to be used in redis
 	 */
-	def translateField(object, field) {
+	static def translateField(object, field) {
 		if(!object.metaClass.hasProperty(object, I18nFields.I18N_FIELDS_RENAME)) return field
 		
 		def redisField = object[I18nFields.I18N_FIELDS_RENAME][field]?:field
@@ -249,7 +256,7 @@ class I18nFieldsHelper implements Serializable {
 	 * @param locale locale for the values to retrieve
 	 * @return map with values
 	 */
-	def fetch(object, locale) {
+	static def fetch(object, locale) {
 		def objectId = object.id
 		def className = object.class.simpleName.toLowerCase()
 		
@@ -264,15 +271,16 @@ class I18nFieldsHelper implements Serializable {
 	 * @param locale locale to fill
 	 * @return
 	 */
-	def populateCache(object, locale) {
-		if(object.valuesCache[locale.toString()]) return;
-
+	static def populateCache(object, locale) {
 		def values = fetch(object, locale)
 		if(!values) throw new Exception("Redis value not found.")
-		object.valuesCache[locale.toString()] = values
+	    values.each { value ->
+	        if (object.hasProperty("${value.key}_${locale}"))
+	            object."${value.key}_${locale}" = value.value
+        }
 	}
 	
-	static getSpringBean(String name) {
+	static def getSpringBean(String name) {
 		SCH.getServletContext().getAttribute(GA.APPLICATION_CONTEXT).getBean(name);
 	}
 

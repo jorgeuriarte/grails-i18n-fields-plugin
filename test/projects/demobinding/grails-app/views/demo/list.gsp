@@ -25,12 +25,9 @@
 					<tr>
 					
 						<g:sortableColumn property="name_en_US" title="${message(code: 'demo.name_en_US.label', default: 'Nameen US')}" />
-					
 						<g:sortableColumn property="name_fr_FR" title="${message(code: 'demo.name_fr_FR.label', default: 'Namefr FR')}" />
-					
-						<g:sortableColumn property="name" title="${message(code: 'demo.name.label', default: 'Name')}" />
-					
 						<g:sortableColumn property="name_es_ES" title="${message(code: 'demo.name_es_ES.label', default: 'Namees ES')}" />
+						<g:sortableColumn property="name" title="${message(code: 'demo.name.label', default: 'Name')}" />
 					
 					</tr>
 				</thead>
@@ -39,12 +36,9 @@
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 					
 						<td><g:link action="show" id="${demoInstance.id}">${fieldValue(bean: demoInstance, field: "name_en_US")}</g:link></td>
-					
 						<td>${fieldValue(bean: demoInstance, field: "name_fr_FR")}</td>
-					
-						<td>${fieldValue(bean: demoInstance, field: "name")}</td>
-					
 						<td>${fieldValue(bean: demoInstance, field: "name_es_ES")}</td>
+						<td>${fieldValue(bean: demoInstance, field: "name")}</td>
 					
 					</tr>
 				</g:each>

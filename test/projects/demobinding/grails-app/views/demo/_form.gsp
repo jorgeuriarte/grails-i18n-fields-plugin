@@ -18,14 +18,6 @@
 	<g:textField name="name_fr_FR" value="${demoInstance?.name_fr_FR}"/>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: demoInstance, field: 'name', 'error')} ">
-	<label for="name">
-		<g:message code="demo.name.label" default="Name" />
-		
-	</label>
-	<g:textField name="name" value="${demoInstance?.name}"/>
-</div>
-
 <div class="fieldcontain ${hasErrors(bean: demoInstance, field: 'name_es_ES', 'error')} ">
 	<label for="name_es_ES">
 		<g:message code="demo.name_es_ES.label" default="Namees ES" />

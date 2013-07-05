@@ -11,6 +11,7 @@ class DemoController {
     }
 
     def list(Integer max) {
+        println Demo.methods*.name.findAll { it.contains("Name"); }
         params.max = Math.min(max ?: 10, 100)
         [demoInstanceList: Demo.list(params), demoInstanceTotal: Demo.count()]
     }
@@ -21,10 +22,6 @@ class DemoController {
 
     def save() {
         def demoInstance = new Demo(params)
-        println "${params.name_en_US} - ${demoInstance.name_en_US}"
-        println demoInstance.transients
-        println demoInstance.constraints
-        
         if (!demoInstance.save(flush: true)) {
             render(view: "create", model: [demoInstance: demoInstance])
             return
