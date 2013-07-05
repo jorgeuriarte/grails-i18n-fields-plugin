@@ -250,7 +250,8 @@ class I18nFieldsHelper implements Serializable {
 		else {
 			def result = ""
 			try {
-				populateCache(object, locale)
+			    if (!object.@"${field}")
+				    populateCache(object, locale)
 				result = object.@"${field}"
 			}
 			catch(Exception e) {
