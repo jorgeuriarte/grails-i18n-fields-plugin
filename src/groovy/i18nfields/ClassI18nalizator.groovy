@@ -218,9 +218,13 @@ class ClassI18nalizator {
     /**
      * Adds a String Field to the class.
      */
-	private addI18nField(name) {
+	private addI18nField(String name) {
 	    log.info("Adding '${name}' field to ${classNode.name}")
-		classNode.addProperty(name, Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), null, null)
+		classNode.addProperty(name, Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), getGetterMethod(name), null)
+	}
+	
+	def getGetterMethod(field) {
+		return new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValue(this, '${field}')").pop();
 	}
 	
 

@@ -11,7 +11,6 @@ class DemoController {
     }
 
     def list(Integer max) {
-        println Demo.methods*.name.findAll { it.contains("Name"); }
         params.max = Math.min(max ?: 10, 100)
         [demoInstanceList: Demo.list(params), demoInstanceTotal: Demo.count()]
     }
