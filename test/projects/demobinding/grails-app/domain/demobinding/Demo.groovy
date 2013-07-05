@@ -9,4 +9,5 @@ class Demo {
     }
     
     static i18nFields = ['name']
+    static i18nFieldsRename = ['name': 'nombre']
 }

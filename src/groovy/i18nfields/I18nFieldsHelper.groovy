@@ -203,49 +203,27 @@ class I18nFieldsHelper implements Serializable {
 	 * Return the field value for the current locale.
 	 * 
 	 * @param object domain class instance being used.
-	 * @param field
+	 * @param field field to retrieve, like name or description
 	 * @return
 	 */
 	static String getLocalizedValue( object, field ) {
-		assert object != null, "object to retrieve value should never be null"
-		
-		// If current locale is on readis, load cache and then retrieve value
-		// if it is not, then use the field as field_${locale}
 		def locale = i18nfields.I18nFieldsHelper.getSupportedLocale()
-		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale.toString())
-		
-		if(!isRedisLocale) return object["${field}_${locale}"]
-		else {
-			def result = ""
-			try {
-				populateCache(object, locale)
-				
-				result = object["${field}_${locale}"]
-			}
-			catch(Exception e) {
-				log.warn("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
-				
-				// If something goes wrong, use default language if avaible, otherwise return empty string.
-				// default language should be a gorm language.
-				def grailsApplication = getSpringBean("grailsApplication")
-				def default_locale = grailsApplication.config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
-				if(default_locale) {
-					result = object["${field}_${default_locale}"]
-				} 
-			}
-			return result;
-		}
+		return getValue(object, "${field}_${locale}")
 	}
 	
+	/**
+	 * Return a field value even if it is stored in redis.
+	 * @param object domain class instance being used.
+	 * @param field field with locale to retrieve, like name_es_ES or description_es_ES
+	 */
 	static String getValue( object, field ) {
 	    assert object != null, "object to retrieve value should never be null"
 		
 		def locale = field[-5..-1]
+		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale)
 		
-		// If current locale is on readis, load cache and then retrieve value
-		// if it is not, then use the field as field_${locale}
-		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale.toString())
-		
+		// If requested locale is in redis, load cache and then retrieve value
+		// if it is not, then use the field directly.
 		if(!isRedisLocale) return object.@"${field}"
 		else {
 			def result = ""
@@ -257,7 +235,7 @@ class I18nFieldsHelper implements Serializable {
 			catch(Exception e) {
 				log.warn("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
 				
-				// If something goes wrong, use default language if avaible, otherwise return empty string.
+				// If something goes wrong, use default language if available, otherwise return empty string.
 				// default language should be a gorm language.
 				def grailsApplication = getSpringBean("grailsApplication")
 				def default_locale = grailsApplication.config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
