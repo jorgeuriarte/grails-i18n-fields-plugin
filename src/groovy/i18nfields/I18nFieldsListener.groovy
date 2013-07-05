@@ -26,24 +26,19 @@ public class I18nFieldsListener implements SaveOrUpdateEventListener, PreDeleteE
 	def calls = [:]
 	def i = 0
 	public void onSaveOrUpdate(final SaveOrUpdateEvent event) {
-		if (event.entity.hasProperty(I18nFields.TEMPSTRINGS) && !inCall(event.entity, 'update')) {
+		if (!inCall(event.entity, 'update')) {
 			setCall(event.entity, 'update')
-//			if (i++ == 100)
-//				throw new RuntimeException("STOP")
-		
-			Literal.withNewSession { session ->
-				updateFieldsFor(event.entity)
-			}
+			
+			I18nFieldsHelper.pushAll(event.entity)
+
 			releaseCall(event.entity, 'update')
 		}
 	}
 
 	public boolean onPreUpdate(final PreUpdateEvent event) {
-		if (event.entity.hasProperty(I18nFields.TEMPSTRINGS)) {
-			def dirty = event.entity.dirtyPropertyNames
-			if (dirty - ['lastUpdated', 'dateCreated'] == [])
-				return true
-		}
+		if (event.entity.dirtyPropertyNames - ['lastUpdated', 'dateCreated'] == [])
+			return true
+				
 		return false
 	}
 

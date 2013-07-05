@@ -250,7 +250,7 @@ class I18nFieldsHelper implements Serializable {
 	/**
 	 * Transforms the field name to the redis field name.
 	 * @param field field to adapt.
-	 * @return name of the hash field to be used in redis
+	 * @return name of the hash field to be used in redis.
 	 */
 	static def translateField(object, field) {
 		if(!object.metaClass.hasProperty(object, I18nFields.I18N_FIELDS_RENAME)) return field
@@ -260,11 +260,47 @@ class I18nFieldsHelper implements Serializable {
 	}
 	
 	/**
-	 * Retrieve from redis the values for a object
+	 * @param object domain class instance.
+	 * @param locale locale to save
+	 */
+	static def push(object, locale) {
+	    // get redis key to persist.
+	    def objectId =  object.id
+	    def className = object.class.simpleName.toLowerCase()
+		String keyName = "${locale}:${className}:${objectId}"
+
+        println "0000"
+        // Gather values to persist.	    
+	    def values = [:]
+	    object[I18nFields.I18N_FIELDS].each { key ->
+	        println key
+	        if (object["${key}_${locale}"])
+	            values[object[I18nFields.I18N_FIELDS_RENAME][key]] = object["${key}_${locale}"]
+	    }
+		
+		// If there is something to save... do it.
+		if (values) {
+		    println values
+		    redis.hmset(keyName, values)
+        }
+	}
+	
+	/**
+	 * Save in redis all the locales
+	 */
+	static def pushAll(object) {
+	    def locales = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.LOCALES]
+	    locales.each { locale ->
+	        push(object, locale)
+	    }
+	}
+	
+	/**
+	 * Retrieve from redis the values for a object.
 	 *
-	 * @param object object which values will be fetched
-	 * @param locale locale for the values to retrieve
-	 * @return map with values
+	 * @param object object which values will be fetched.
+	 * @param locale locale for the values to retrieve.
+	 * @return map with values.
 	 */
 	static def fetch(object, locale) {
 		def objectId = object.id
@@ -276,13 +312,34 @@ class I18nFieldsHelper implements Serializable {
 	}
 	
 	/**
+	 * Retrieve from redis the values of a locale. Ranames the keys if neccesary.
+	 * @param object domain class instance.
+	 * @param locale locale to retrieve.
+	 * @return map with values.
+	 */
+	static def getRedisValues(object, locale) {
+	    def grailsToRedis = object[I18nFields.I18N_FIELDS_RENAME]
+	    def redisToGrails = grailsToRedis.collectEntries { key, value -> [(value), key]}
+	    
+	    def values = fetch(object, locale).collectEntries { keyRedis, valueRedis ->
+	        if( redisToGrails.containsKey(keyRedis) ) {
+	            return [ (redisToGrails[keyRedis]) : valueRedis ]
+            }
+            return [(keyRedis): valueRedis]
+	    }
+	    
+	    println values;
+	    return values;
+	}
+	
+	/**
 	 * Load values from redis into the cache
 	 * @param object object to fill the cache
 	 * @param locale locale to fill
 	 * @return
 	 */
 	static def populateCache(object, locale) {
-		def values = fetch(object, locale)
+		def values = getRedisValues(object, locale)
 		if(!values) throw new Exception("Redis value not found.")
 	    values.each { value ->
 	        if (object.hasProperty("${value.key}_${locale}"))
