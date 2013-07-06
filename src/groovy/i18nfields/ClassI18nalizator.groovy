@@ -52,15 +52,8 @@ class ClassI18nalizator {
      * Execute the transformation
      */
 	void transformClass() {
-		createLocalStructures()
-		addFieldsAndAccessors()
-	}
-
-    /**
-     * Add the needed helpers and auxiliary methods to the class.
-     */
-	private void createLocalStructures() {
 		addHelper()
+		addFieldsAndAccessors()
 	}
 
     /**
@@ -75,7 +68,6 @@ class ClassI18nalizator {
             removeConstraintsFor(fieldName)
             
 			addGettersAndSetters(fieldName)
-			// makeFieldTransient(fieldName)
 		}
 	}
 
@@ -181,7 +173,9 @@ class ClassI18nalizator {
     /**
      * Get or create the Transients property
      */
-	private getOrCreateTransientsField() { return getOrCreateField(I18nFields.TRANSIENTS, new ListExpression()); }
+	private getOrCreateTransientsField() { 
+	    return getOrCreateField(I18nFields.TRANSIENTS, new ListExpression()); 
+    }
 	
 	/**
 	 * Get or create the Constraints property
@@ -223,10 +217,9 @@ class ClassI18nalizator {
 		classNode.addProperty(name, Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), getGetterMethod(name), null)
 	}
 	
-	def getGetterMethod(field) {
+	private def getGetterMethod(field) {
 		return new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValue(this, '${field}')").pop();
-	}
-	
+	}	
 
 	private boolean hasConstraints(field) {
 		return hasConstraints() && null != getConstraints(field)
@@ -304,10 +297,6 @@ class ClassI18nalizator {
      */
 	private addGettersAndSetters(field) {
 		addProxyGetter(field)
-		// addProxySetter(field)
-
-		// addLocalizedGetter(field)
-		// addLocalizedSetter(field)
 	}
 
     /**
@@ -327,135 +316,5 @@ class ClassI18nalizator {
 	    );
 	    
 		classNode.addMethod(methodNode);
-	}
-
-	private addProxySetter(field) {
-		def methodName = GrailsClassUtils.getSetterName(field)
-		def code = proxySetterCode(field)
-		def parameters = [new Parameter(ClassHelper.make(String, false), "value")] as Parameter[]
-		// TODO: Use log4j
-		println "[i18nFields] Adding '${methodName}(String value)' proxy method to ${classNode.name}"
-		def method = getNewMethod(methodName, parameters, code)
-		classNode.addMethod(method)
-	}
-
-	private addLocalizedGetter(field) {
-		def methodName = GrailsClassUtils.getGetterName(field)
-		def code = localizedGetterCode(field)
-		def parameters = [new Parameter(ClassHelper.make(Locale, false), "locale")] as Parameter[]
-		// TODO: Use log4j
-		println "[i18nFields] Adding '${methodName}(Locale locale)' helper getter to ${classNode.name}"
-		def method = getNewMethod(methodName, parameters, code)
-		classNode.addMethod(method)
-	}
-
-	private addLocalizedSetter(field) {
-		def methodName = GrailsClassUtils.getSetterName(field)
-		def code = localizedSetterCode(field)
-		Parameter[] parameters = [
-				new Parameter(ClassHelper.make(String, false), "value"),
-				new Parameter(ClassHelper.make(Locale, false), "locale")
-		] as Parameter[]
-		// TODO: Use log4j
-		println "[i18nFields] Adding '${methodName}(String value, Locale locale)' helper setter to ${classNode.name}"
-		def method = getNewMethod(methodName, parameters, code)
-		classNode.addMethod(method)
-	}
-
-	private addLocalizedNamedSetters(field) {
-		locales.each { locl ->
-			def methodName = GrailsClassUtils.getSetterName("${field}_${locl}")
-			def code = localizedNamedSetterCode(field, locl)
-			Parameter[] parameters = [
-				new Parameter(ClassHelper.make(Object, false), "value")
-			] as Parameter[]
-			// TODO: Use log4j
-			println "[i18nFields] Adding '${methodName}' localized setter to ${classNode.name}"
-			def method = getNewMethod(methodName, parameters, code)
-			classNode.addMethod(method)
-		}
-	}
-
-	private addLocalizedNamedGetters(field) {
-		locales.each { locl ->
-			def methodName = GrailsClassUtils.getGetterName("${field}_${locl}")
-			def code = localizedNamedGetterCode(field, locl)
-			def parameters = [] as Parameter[]
-			// TODO: Use log4j
-			println "[i18nFields] Adding '${methodName}' localized getter to ${classNode.name}"
-			def method = getNewMethod(methodName, parameters, code, true)
-			classNode.addMethod(method)
-		}
-	}
-
-	private localizedNamedGetterCode = { field, locale ->
-		"""
-def locale = new Locale('${locale.language}', '${locale.country}')
-def fieldValue = ${getterCode(field)}
-return fieldValue
-"""
-	}
-
-	private localizedNamedSetterCode = { field, locale ->
-		"""
-def locale = new Locale('${locale.language}', '${locale.country}')
-${setterCode(field)}
-"""
-	}
-
-	private proxyGetterCode = { field ->
-		"""
-def locale = org.springframework.context.i18n.LocaleContextHolder.getLocale()
-if (${I18nFields.LOCALES}.containsKey(locale.language) && !${I18nFields.LOCALES}[locale.language].contains(locale.country)) {
-	locale = new Locale(locale.language)
-}
-def fieldValue = ${getterCode(field)}
-return fieldValue
-"""
-	}
-
-	private proxySetterCode = { field ->
-		"""
-def locale = org.springframework.context.i18n.LocaleContextHolder.getLocale()
-${setterCode(field)}
-"""
-	}
-
-	private localizedGetterCode = { field ->
-		// TODO: Review this logic!!
-		"""
-println "I am inside a localizedGetterCode for '${field}'"
-if (${I18nFields.LOCALES}.containsKey(locale.language) && !${I18nFields.LOCALES}[locale.language].contains(locale.country)) {
-	locale = new Locale(locale.language)	
-}
-def fieldValue = ${getterCode(field)}
-return fieldValue
-"""
-	}
-
-	private localizedSetterCode = { field ->
-		"""
-if (${I18nFields.LOCALES}.containsKey(locale.language) && !${I18nFields.LOCALES}[locale.language].contains(locale.country)) {
-	locale = new Locale(locale.language)
-}
-${setterCode(field)}
-"""
-	}
-
-	private getterCode = { field ->
-		"this.i18nFieldsHelper.getLocalizedValue(this, '${field}')"
-	}
-
-	private setterCode = { field ->
-        "this.\"${field}_\${locale}\" = value"
-	}
-
-	private getColumnName(field) {
-		return field.replaceAll(/\B[A-Z]/) { '_' + it }.toLowerCase()
-	}
-	
-	private getNewMethod(name, parameters, code, transientField = false) {
-		def blockStatement = new AstBuilder().buildFromString(code).pop()
-		return new MethodNode(name, ACC_PUBLIC, ClassHelper.make(transientField?Object.class:String.class, false), parameters, [] as ClassNode[], blockStatement)
 	}
 }
