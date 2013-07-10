@@ -5,92 +5,67 @@ import org.grails.datastore.mapping.engine.event.*
 
 class I18nFieldsPersistenceEventListener extends AbstractPersistenceEventListener{
 
-	def calls = [:]
-	def i = 0
-	
     public I18nFieldsPersistenceEventListener(final Datastore datastore) {
         super(datastore)
     }
- 
+    
     @Override
     protected void onPersistenceEvent(final AbstractPersistenceEvent event) {
         switch(event.eventType) {
-        	case 'PreUpdate':
-        		println "i18n PreUpdate ${event.entity?.name}"
-                if (!(event.entity.hasProperty(I18nFields.I18N_FIELDS) && event.entity.dirtyPropertyNames - ['lastUpdated', 'dateCreated'] == [])){
-                	event.cancel()
-                }
+            case 'PreInsert':
+                println "PRE INSERT ${event.entityObject}"
+                break
+            case 'PostInsert':
+                onPostInsert(event)
+                break
+            case 'PreUpdate':
+                println "PRE UPDATE ${event.entityObject}"
+                break;
+            case 'PostUpdate':
+                onPostUpdate(event)
                 break;
             case 'PreDelete':
-            	println "i18n PreUpdate ${event.entity?.name}"
-                if (event.entity.hasProperty(I18nFields.I18N_FIELDS)) {
-					Literal.withNewSession { session ->
-						event.entity.i18nFieldsHelper.deleteFieldsFor(event.entity)
-					}
-				}
-                break
-            case 'SaveOrUpdate':
-            	println "i18n SaveOrUpdate ${event.entity?.name}"
-                if (event.entity.hasProperty(I18nFields.I18N_FIELDS) && !inCall(event.entity, 'update')) {
-					setCall(event.entity, 'update')
-					I18nFieldsHelper.pushAll(event.entity)
-					releaseCall(event.entity, 'update')
-				}
+                println "PRE DELETE ${event.entityObject}"
                 break;
+            case 'PostDelete':
+                onPostDelete(event)
+                break;
+            case 'PreLoad':
+                println "PRE LOAD ${event.entityObject}"
+                break;
+            case 'PostLoad':
+                println "POST LOAD ${event.entityObject}"
+                break;
+            default:
+                println "DEFAULT: ${event.eventType} ${event.entityObject}"
         }
     }
- 
+    
+    protected void onPostInsert(event) { saveEntity(event.entityObject); }
+    protected void onPostUpdate(event) { saveEntity(event.entityObject); }
+    protected void onPostDelete(event) { deleteEntity(event.entityObject); }
+    
+    /**
+     * Persist entity values.
+     * At this point entity should have a id
+     */
+    protected void saveEntity(entity) {
+        if(!entity.hasProperty(I18nFields.I18N_FIELDS)) return; // Entity should have i18n
+        // TODO: test if a i18n field is dirty
+        I18nFieldsHelper.pushAll(entity)
+    }
+    
+    /**
+     * Delete a entity.
+     * At this point the entity should ahve a id
+     */
+    protected void deleteEntity(entity) {
+        if(!entity.hasProperty(I18nFields.I18N_FIELDS)) return; // Entity should have i18n
+        I18nFieldsHelper.delete(entity)
+    }
+    
     @Override
     public boolean supportsEventType(Class eventType) {
         return AbstractPersistenceEvent.class.isAssignableFrom(eventType)
     }
-    
-	private void setCall(entity, call) {
-		if (!calls[entity])
-			calls[entity] = [:]
-		calls[entity][call] = true
-	}
-
-	private void releaseCall(entity, call) {
-		if (!calls[entity])
-			calls[entity] = [:]
-		calls[entity][call] = false
-	}
-
-	private boolean inCall(entity, call) {
-		calls[entity] && calls[entity][call]
-	}
-
-    def alreadySavedFieldsFor(object) {
-    	def saved = [:]
-    	if (object.id) {
-			def hql = "\
-				select lit \
-				from Literal as lit \
-				where lit.myclass = :myclass \
-				and lit.myobject = :myid \
-			"
-			def existing = Literal.executeQuery(hql, [myclass:object.class.name, myid:object.id])
-			existing.each {
-				saved["${it.locale}-${it.field}"] = it
-			}
-    	}
-		return saved
-    }
-
-    def updateFieldsFor(object) {
-		def raiz = object."${I18nFields.TEMPSTRINGS}"
-		def saved = this.alreadySavedFieldsFor(object)
-		raiz.keySet().each { locale ->
-			raiz[locale].each { field, value ->
-				def literal = saved["${locale}-${field}"]
-				if (!literal) {
-					literal = new Literal(myclass:object.class.name, myobject:object.id, locale:locale, field:field)					
-				}
-				literal.value = raiz[locale][field]
-				literal.save()
-			}
-		}
-    }
- 
 }

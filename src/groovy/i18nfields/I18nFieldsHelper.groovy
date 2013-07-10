@@ -305,6 +305,21 @@ class I18nFieldsHelper implements Serializable {
 	}
 	
 	/**
+	 * Delete a entity from redis
+	 * WARNING: All the key is deleted, not just the locale information added by this class.
+	 */
+	static def delete(object) {
+	    def objectId =  object.id
+	    def className = object.class.simpleName.toLowerCase()
+
+	    def locales = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.LOCALES]
+	    locales.each { locale ->
+    	    String keyName = "${locale}:${className}:${objectId}"
+    	    redis.del(keyName)
+	    }
+	}
+	
+	/**
 	 * Retrieve from redis the values for a object.
 	 *
 	 * @param object object which values will be fetched.
@@ -348,6 +363,7 @@ class I18nFieldsHelper implements Serializable {
 	 */
 	static def populateCache(object, locale) {
 		def values = getRedisValues(object, locale)
+		if(!values) return;
 		if(!values) throw new Exception("Redis value not found.")
 	    values.each { value ->
 	        if (object.hasProperty("${value.key}_${locale}"))
