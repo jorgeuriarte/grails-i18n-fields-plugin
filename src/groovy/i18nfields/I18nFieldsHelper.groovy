@@ -232,7 +232,7 @@ class I18nFieldsHelper implements Serializable {
 	    assert object != null, "object to retrieve value should never be null"
 		
 		def locale = field[-5..-1]
-		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].containsKey(locale)
+		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale)
 		
 		// If requested locale is in redis, load cache and then retrieve value
 		// if it is not, then use the field directly.
