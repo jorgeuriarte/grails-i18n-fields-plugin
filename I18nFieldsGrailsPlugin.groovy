@@ -57,24 +57,11 @@ class I18nFieldsGrailsPlugin {
     }
 
     def doWithApplicationContext = { applicationContext ->
-    	def listeners = applicationContext.sessionFactory.eventListeners
-    	def listener = new I18nFieldsListener()
-    	['preDelete', 'saveOrUpdate', 'preUpdate'].each {
-    		addEventTypeListener(listeners, listener, it)
-    	}
+    	application.mainContext.eventTriggeringInterceptor.datastores.each { k, datastore ->
+            def listener = new I18nFieldsPersistenceEventListener(datastore)
+            applicationContext.addApplicationListener(listener)
+        }
     }
-
-    private void addEventTypeListener(listeners, listener, type) {
-    	def typeProperty = "${type}EventListeners"
-    	def typeListeners = listeners."${typeProperty}"
-
-    	def expandedTypeListeners = new Object[typeListeners.length + 1]
-    	System.arraycopy(typeListeners, 0, expandedTypeListeners, 0, typeListeners.length)
-    	expandedTypeListeners[-1] = listener
-
-    	listeners."${typeProperty}" = expandedTypeListeners
-    }
-
 
 }
 
