@@ -200,6 +200,18 @@ class I18nFieldsHelper implements Serializable {
     }
 	
 	/**
+	 * Return the field value for the desired locale.
+	 * 
+	 * @param object domain class instance being used.
+	 * @param field field to retrieve, like name or description
+	 * @param locale the locale used to localize
+	 * @return
+	 */
+	static String getLocalizedValue( object, field, locale ) {
+		return getValue(object, "${field}_${locale}")
+	}
+	
+	/**
 	 * Return the field value for the current locale.
 	 * 
 	 * @param object domain class instance being used.
@@ -208,7 +220,7 @@ class I18nFieldsHelper implements Serializable {
 	 */
 	static String getLocalizedValue( object, field ) {
 		def locale = i18nfields.I18nFieldsHelper.getSupportedLocale()
-		return getValue(object, "${field}_${locale}")
+		return getLocalizedValue(object, field, locale)
 	}
 	
 	/**
@@ -269,18 +281,15 @@ class I18nFieldsHelper implements Serializable {
 	    def className = object.class.simpleName.toLowerCase()
 		String keyName = "${locale}:${className}:${objectId}"
 
-        println "0000"
         // Gather values to persist.	    
 	    def values = [:]
 	    object[I18nFields.I18N_FIELDS].each { key ->
-	        println key
 	        if (object["${key}_${locale}"])
-	            values[object[I18nFields.I18N_FIELDS_RENAME][key]] = object["${key}_${locale}"]
+	            values[object[I18nFields.I18N_FIELDS_RENAME][key]?:key] = object["${key}_${locale}"]
 	    }
 		
 		// If there is something to save... do it.
 		if (values) {
-		    println values
 		    redis.hmset(keyName, values)
         }
 	}
@@ -328,7 +337,6 @@ class I18nFieldsHelper implements Serializable {
             return [(keyRedis): valueRedis]
 	    }
 	    
-	    println values;
 	    return values;
 	}
 	

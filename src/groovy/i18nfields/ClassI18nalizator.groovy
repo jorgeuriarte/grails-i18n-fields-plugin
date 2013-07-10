@@ -297,6 +297,7 @@ class ClassI18nalizator {
      */
 	private addGettersAndSetters(field) {
 		addProxyGetter(field)
+		addLocalizedGetter(field)
 	}
 
     /**
@@ -316,5 +317,23 @@ class ClassI18nalizator {
 	    );
 	    
 		classNode.addMethod(methodNode);
+	}
+	
+	private addLocalizedGetter(field) {
+		def methodName = GrailsClassUtils.getGetterName(field)
+		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getLocalizedValue(this, '${field}', locale)").pop();
+		
+		def parameters = [new Parameter(ClassHelper.make(Locale, false), "locale")] as Parameter[]
+
+		def methodNode = new MethodNode(
+		    methodName, 
+		    ACC_PUBLIC, 
+		    ClassHelper.STRING_TYPE, 
+		    parameters, 
+		    ClassHelper.EMPTY_TYPE_ARRAY, 
+		    code
+	    );
+	    
+		classNode.addMethod(methodNode)
 	}
 }
