@@ -245,7 +245,7 @@ class I18nFieldsHelper implements Serializable {
 				result = object.@"${field}"
 			}
 			catch(Exception e) {
-				log.warn("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
+				// log.warn("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
 				
 				// If something goes wrong, use default language if available, otherwise return empty string.
 				// default language should be a gorm language.
@@ -285,7 +285,10 @@ class I18nFieldsHelper implements Serializable {
 	    def values = [:]
 	    object[I18nFields.I18N_FIELDS].each { key ->
 	        if (object["${key}_${locale}"])
-	            values[object[I18nFields.I18N_FIELDS_RENAME][key]?:key] = object["${key}_${locale}"]
+	            if(object.hasProperty(I18nFields.I18N_FIELDS_RENAME)) 
+    	            values[object[I18nFields.I18N_FIELDS_RENAME][key]?:key] = object["${key}_${locale}"]
+	            else
+	                values[key] = object["${key}_${locale}"]
 	    }
 		
 		// If there is something to save... do it.
@@ -342,9 +345,9 @@ class I18nFieldsHelper implements Serializable {
 	 * @return map with values.
 	 */
 	static def getRedisValues(object, locale) {
-	    def grailsToRedis = object[I18nFields.I18N_FIELDS_RENAME]
+	    def grailsToRedis = object.hasProperty(I18nFields.I18N_FIELDS_RENAME) ? object[I18nFields.I18N_FIELDS_RENAME] : [:]
 	    def redisToGrails = grailsToRedis.collectEntries { key, value -> [(value), key]}
-	    
+
 	    def values = fetch(object, locale).collectEntries { keyRedis, valueRedis ->
 	        if( redisToGrails.containsKey(keyRedis) ) {
 	            return [ (redisToGrails[keyRedis]) : valueRedis ]
