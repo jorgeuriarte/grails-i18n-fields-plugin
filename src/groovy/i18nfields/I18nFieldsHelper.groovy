@@ -25,7 +25,7 @@ class I18nFieldsHelper implements Serializable {
      */
 	static getLocale() {
 	    def locale = LocaleContextHolder.getLocale()
-	    if(locale.toString() == "") locale = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
+	    if(!locale || locale.toString() == "") locale = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
         return locale 
 	}
 	
