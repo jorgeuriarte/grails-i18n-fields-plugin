@@ -71,8 +71,6 @@ class DemoController {
         }
 
         demoInstance.properties = params
-        println "${params.name_en_US} - ${demoInstance.name_en_US}"
-
         if (!demoInstance.save(flush: true)) {
             render(view: "edit", model: [demoInstance: demoInstance])
             return
