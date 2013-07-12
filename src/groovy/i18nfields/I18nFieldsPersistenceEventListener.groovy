@@ -12,32 +12,15 @@ class I18nFieldsPersistenceEventListener extends AbstractPersistenceEventListene
     @Override
     protected void onPersistenceEvent(final AbstractPersistenceEvent event) {
         switch(event.eventType) {
-            case 'PreInsert':
-                println "PRE INSERT ${event.entityObject}"
-                break
             case 'PostInsert':
                 onPostInsert(event)
                 break
-            case 'PreUpdate':
-                println "PRE UPDATE ${event.entityObject}"
-                break;
             case 'PostUpdate':
                 onPostUpdate(event)
-                break;
-            case 'PreDelete':
-                println "PRE DELETE ${event.entityObject}"
                 break;
             case 'PostDelete':
                 onPostDelete(event)
                 break;
-            case 'PreLoad':
-                println "PRE LOAD ${event.entityObject}"
-                break;
-            case 'PostLoad':
-                println "POST LOAD ${event.entityObject}"
-                break;
-            default:
-                println "DEFAULT: ${event.eventType} ${event.entityObject}"
         }
     }
     
