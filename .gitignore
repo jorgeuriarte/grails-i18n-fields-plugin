@@ -7,3 +7,4 @@ web-app/images
 web-app/js
 .settings
 target-eclipse
+test/projects/demobinding/target/
