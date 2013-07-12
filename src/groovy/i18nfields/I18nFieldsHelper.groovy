@@ -36,9 +36,11 @@ class I18nFieldsHelper implements Serializable {
 		
 	    if (!locales.contains(locale.toString())) {
             def lang = locale.toString().split("_")[0]
-            locale = locales.find { candidato -> candidato.startsWith(lang) }
+            def selected_locale = locales.find { candidato -> candidato.startsWith(lang) }
             
-            if(!locale) throw new Exception("Locale ${locale} not found!")
+            if(!selected_locale) throw new Exception("Locale ${locale} not found!")
+            log.warn("Locale ${locale} not found. Using ${selected_locale}")
+            locale = selected_locale
         }
         
         return locale
