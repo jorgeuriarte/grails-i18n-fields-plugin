@@ -5,6 +5,7 @@
 		<g:each in="${grailsApplication.config.i18nFields.locales}" var="locale">
 			<option value="${locale }">${locale }</option>
 		</g:each>
+		<option value="es_PE">Español Peruano</option>
 	</select>
 </li>
 

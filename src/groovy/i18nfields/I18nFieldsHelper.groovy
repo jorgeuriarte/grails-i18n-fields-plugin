@@ -24,7 +24,7 @@ class I18nFieldsHelper implements Serializable {
      * Gets current locale
      */
 	static getLocale() {
-		return LocaleContextHolder.getLocale()
+		return LocaleContextHolder.getLocale() ?: getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
 	}
     
     /**
@@ -33,8 +33,12 @@ class I18nFieldsHelper implements Serializable {
 	static getSupportedLocale() {
 	    def locale = getLocale()
 		def locales = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.LOCALES]
+		
 	    if (!locales.contains(locale.toString())) {
-            throw new Exception("Locale ${locale} not found!")
+            def lang = locale.toString().split("_")[0]
+            locale = locales.find { candidato -> candidato.startsWith(lang) }
+            
+            if(!locale) throw new Exception("Locale ${locale} not found!")
         }
         
         return locale
