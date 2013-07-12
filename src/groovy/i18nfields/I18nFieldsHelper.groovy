@@ -24,14 +24,22 @@ class I18nFieldsHelper implements Serializable {
      * Gets current locale
      */
 	static getLocale() {
-		return LocaleContextHolder.getLocale() ?: getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
+	    def locale = LocaleContextHolder.getLocale()
+	    if(locale.toString() == "") locale = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
+        return locale 
 	}
+	
+	/**
+	 * Get the locale to be used instead of the current locale.
+	 */
+	static getSupportedLocale() {
+        return getSupportedLocale(getLocale())
+    }
     
     /**
-     * Gets the locale to be used
+     * Gets the locale to be used instead of given locale
      */
-	static getSupportedLocale() {
-	    def locale = getLocale()
+	static getSupportedLocale( locale ) {
 		def locales = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.LOCALES]
 		
 	    if (!locales.contains(locale.toString())) {
@@ -39,7 +47,7 @@ class I18nFieldsHelper implements Serializable {
             def selected_locale = locales.find { candidato -> candidato.startsWith(lang) }
             
             if(!selected_locale) throw new Exception("Locale ${locale} not found!")
-            log.warn("Locale ${locale} not found. Using ${selected_locale}")
+            // log.warn("Locale ${locale} not found. Using ${selected_locale}")
             locale = selected_locale
         }
         
@@ -214,7 +222,8 @@ class I18nFieldsHelper implements Serializable {
 	 * @return
 	 */
 	static String getLocalizedValue( object, field, locale ) {
-		return getValue(object, "${field}_${locale}")
+	    def supported_locale = getSupportedLocale(locale)
+		return getValue(object, "${field}_${supported_locale}")
 	}
 	
 	/**
@@ -372,8 +381,8 @@ class I18nFieldsHelper implements Serializable {
 	 */
 	static def populateCache(object, locale) {
 		def values = getRedisValues(object, locale)
-		if(!values) return;
 		if(!values) throw new Exception("Redis value not found.")
+		
 	    values.each { value ->
 	        if (object.hasProperty("${value.key}_${locale}"))
 	            object."${value.key}_${locale}" = value.value
