@@ -308,7 +308,12 @@ class I18nFieldsHelper implements Serializable {
 		
 		// If there is something to save... do it.
 		if (values) {
-		    redis.hmset(keyName, values)
+		    try {
+    		    redis.hmset(keyName, values)
+		    }
+		    catch(Exception e) {
+		        log.error("Can not write in REDIS ! But it was already saved on mysql. Redis Locales were lost.", e);
+		    }
         }
 	}
 	
