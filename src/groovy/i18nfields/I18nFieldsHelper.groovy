@@ -1,17 +1,14 @@
 package i18nfields
 
-import org.springframework.context.ApplicationContext
-import org.springframework.context.i18n.LocaleContextHolder
-import net.sf.ehcache.*
 import groovy.util.logging.*
+import net.sf.ehcache.*
 
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
+import org.springframework.context.i18n.LocaleContextHolder
 
 @Log4j()
 class I18nFieldsHelper implements Serializable {
-	transient static def redis = new redis.clients.jedis.Jedis("localhost")
-
 	transient def cacheLiterales
 
 	static transients_model = ["fieldname"]
@@ -140,7 +137,7 @@ class I18nFieldsHelper implements Serializable {
 	def loadFieldsLocallyFromRedis(locale, object) {
 		println "Getting from redis! (${object?.id}:${locale.toString()})"
 		def raiz = object?."${I18nFields.TEMPSTRINGS}"
-		raiz[locale.toString()] = redis.hgetAll("literal:${object.class.name}:${object?.id}:${locale.toString()}")
+		raiz[locale.toString()] = RedisHolder.instance.hgetAll("literal:${object.class.name}:${object?.id}:${locale.toString()}")
 		cachePut("${object.class.name}:${object.id}:${locale}", raiz[locale.toString()])
 	}
 
@@ -309,7 +306,7 @@ class I18nFieldsHelper implements Serializable {
 		// If there is something to save... do it.
 		if (values) {
 		    try {
-    		    redis.hmset(keyName, values)
+    		    RedisHolder.instance.hmset(keyName, values)
 		    }
 		    catch(Exception e) {
 		        log.error("Can not write in REDIS ! But it was already saved on mysql. Redis Locales were lost.", e);
@@ -338,7 +335,7 @@ class I18nFieldsHelper implements Serializable {
 	    def locales = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.LOCALES]
 	    locales.each { locale ->
     	    String keyName = "${locale}:${className}:${objectId}"
-    	    redis.del(keyName)
+    	    RedisHolder.instance.del(keyName)
 	    }
 	}
 	
@@ -355,7 +352,7 @@ class I18nFieldsHelper implements Serializable {
 		
 		def keyName = "${locale}:${className}:${objectId}"
 		
-		return redis.hgetAll(keyName)
+		return RedisHolder.instance.hgetAll(keyName)
 	}
 	
 	/**

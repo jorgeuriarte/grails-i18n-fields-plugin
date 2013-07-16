@@ -101,4 +101,10 @@ i18nFields {
 
     // If can not fetch a locale from redis, which non-redis locale should we use
     defaultLocale = "es_ES"
+    
+    // Config to access to redis.
+    redisConfig {
+        host = 'localhost'
+		port = 6379
+    }
 }
