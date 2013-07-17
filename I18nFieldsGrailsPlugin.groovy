@@ -9,12 +9,12 @@ import org.hibernate.event.PostInsertEvent
 class I18nFieldsGrailsPlugin {
     static final def log = Logger.getLogger(I18nFieldsGrailsPlugin)
 
-	def version = "0.7.2-SNAPSHOT"
-	def grailsVersion = "1.3 > *"
+	def version = "0.7.0-SNAPSHOT"
+	def grailsVersion = "2.1.0 > *"
 	def pluginExcludes = [
 			"lib/*",
 			"grails-app/i18n/*",
-			"grails-app/domain/i18nfields/Ego.groovy",
+			"grails-app/domain/i18nfields/*",
 			"grails-app/controllers/i18nfields/*",
 			"grails-app/services/i18nfields/*",
 			"grails-app/taglib/i18nfields/*",
