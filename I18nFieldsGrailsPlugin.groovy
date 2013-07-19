@@ -9,9 +9,9 @@ import org.hibernate.event.PostInsertEvent
 class I18nFieldsGrailsPlugin {
     static final def log = Logger.getLogger(I18nFieldsGrailsPlugin)
 
-	def version = "0.7.2-SNAPSHOT"
+	def version = "0.6.4"
 	def grailsVersion = "1.3 > *"
-	def dependsOn = ['yammer-metrics':'2.1.2-1']
+	def dependsOn = ['yammerMetrics':'0.2-SNAPSHOT']
 	def pluginExcludes = [
 			"lib/*",
 			"grails-app/i18n/*",

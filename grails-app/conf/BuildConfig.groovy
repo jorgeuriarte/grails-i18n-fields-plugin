@@ -33,8 +33,7 @@ grails.project.dependency.resolution = {
         compile (":springcache:1.3.1") {
           export = false
         }
-		compile (":yammer-metrics:2.1.2-1")
-        runtime (":yammer-metrics:2.1.2-1") {
+        runtime (":yammer-metrics:0.2-SNAPSHOT") {
           excludes([ group: 'org.slf4j', name: 'slf4j-api', version: '1.6.4']) 
           export = true
         }
