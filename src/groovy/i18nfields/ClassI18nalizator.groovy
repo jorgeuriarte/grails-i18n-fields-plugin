@@ -208,13 +208,18 @@ class ClassI18nalizator {
 		    }
 	    }
 	}
-
+	
     /**
      * Adds a String Field to the class.
      */
 	private addI18nField(String name) {
 	    log.info("Adding '${name}' field to ${classNode.name}")
-		classNode.addProperty(name, Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), getGetterMethod(name), null)
+		classNode.addProperty(name, Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), getGetterMethod(name), getSetterMethod(name))
+	}
+	
+	private def getSetterMethod(field) {
+		// setter should return void. that's why the return statement.
+		return new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.setValue(this, '${field}', value); return;").pop();
 	}
 	
 	private def getGetterMethod(field) {
@@ -299,7 +304,7 @@ class ClassI18nalizator {
 		addProxyGetter(field)
 		addLocalizedGetter(field)
 	}
-
+	
     /**
      * 
      */
