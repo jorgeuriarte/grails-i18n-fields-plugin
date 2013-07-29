@@ -22,9 +22,9 @@ public @interface I18nFields {
 	static final String I18N_FIELDS_TABLE = "i18nFieldsTable"
 	static final String I18N_FIELDS_TABLE_LITERAL= "literal"
 	static final String TEMPSTRINGS = "i18nFieldsTempStrings"
-    static final String CACHESTRINGS = "i18nFieldsCacheStrings"
 	static final String DEFAULT_LOCALE = "defaultLocale"
 	static final String I18N_FIELDS_RENAME = "i18nFieldsRename"
 	static final String CONFIG = "redisConfig"
+	static final String DATA = "i18nFieldInfo"
 }
 

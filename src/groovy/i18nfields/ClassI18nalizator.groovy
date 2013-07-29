@@ -53,6 +53,7 @@ class ClassI18nalizator {
      */
 	void transformClass() {
 		addHelper()
+		addInformationHolder()
 		addFieldsAndAccessors()
 	}
 
@@ -81,6 +82,15 @@ class ClassI18nalizator {
 								new ClassNode(I18nFieldsHelper.class),
 								classNode,
 								new ConstructorCallExpression(new ClassNode(I18nFieldsHelper.class), MethodCallExpression.NO_ARGUMENTS)))
+	}
+	
+	/**
+	 * Add a map to hold information for the object
+	 * @return
+	 */
+	private addInformationHolder() {
+		classNode.addField(new FieldNode(I18nFields.DATA, ACC_PUBLIC, 
+			new ClassNode(Object.class), classNode, new MapExpression()))
 	}
 
     /**

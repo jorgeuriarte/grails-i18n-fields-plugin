@@ -112,7 +112,7 @@ class I18nFieldsHelper implements Serializable {
 				result = object.@"${field}"
 			}
 			catch(Exception e) {
-				// log.warn("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
+				log.warn("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
 				
 				// If something goes wrong, use default language if available, otherwise return empty string.
 				// default language should be a gorm language.
@@ -242,15 +242,21 @@ class I18nFieldsHelper implements Serializable {
 	}
 	
 	/**
-	 * Load values from redis into the cache
+	 * Load values from redis into the cache and properties.
+	 * If cache is already loaded for a language, do nothing.
+	 * 
 	 * @param object object to fill the cache
 	 * @param locale locale to fill
 	 * @return
 	 */
 	static def populateCache(object, locale) {
+		def origin = object[I18nFields.DATA][locale]
+		if(origin) return;
+		
 		def values = getRedisValues(object, locale)
 		if(!values) throw new Exception("Redis value not found.")
 		
+		object[I18nFields.DATA][locale] = values
 	    values.each { value ->
 	        if (object.hasProperty("${value.key}_${locale}"))
 	            object.@"${value.key}_${locale}" = value.value
