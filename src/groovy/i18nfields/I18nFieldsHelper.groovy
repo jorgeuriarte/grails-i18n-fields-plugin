@@ -143,7 +143,7 @@ class I18nFieldsHelper implements Serializable {
 		if(!isRedisLocale) object.@"${field}" = value
 		else {
 			object.@"${field}" = value
-			if( !object.isDirty() ) object.version = (object.version?:-1) + 1
+			if( !object.isDirty() ){ object.version = (!object.version ? null : object.version + 1) }
 		}
 	}
 	

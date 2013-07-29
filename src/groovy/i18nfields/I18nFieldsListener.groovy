@@ -34,7 +34,7 @@ public class I18nFieldsListener implements SaveOrUpdateEventListener, PreDeleteE
      */
     protected void saveEntity(entity) {
         if(!entity.hasProperty(I18nFields.I18N_FIELDS)) return; // Entity should have i18n
-		if(entity.isDirty())
+		if(entity.isDirty() || entity.version == 0)
 			I18nFieldsHelper.pushAll(entity)
     }
     

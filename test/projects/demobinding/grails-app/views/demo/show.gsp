@@ -35,27 +35,45 @@
 				<g:if test="${demoInstance?.name_en_US}">
 				<li class="fieldcontain">
 					<span id="name_en_US-label" class="property-label"><g:message code="demo.name_en_US.label" default="Nameen US" /></span>
-					
-						<span class="property-value" aria-labelledby="name_en_US-label"><g:fieldValue bean="${demoInstance}" field="name_en_US"/></span>
-					
+					<span class="property-value" aria-labelledby="name_en_US-label"><g:fieldValue bean="${demoInstance}" field="name_en_US"/></span>
+				</li>
+				<li class="fieldcontain">
+					<span id="field1_en_US-label" class="property-label"><g:message code="demo.field1_en_US.label" default="field1 en US" /></span>
+					<span class="property-value" aria-labelledby="field1_en_US-label"><g:fieldValue bean="${demoInstance}" field="field1_en_US"/></span>
+				</li>
+				<li class="fieldcontain">
+					<span id="field2_en_US-label" class="property-label"><g:message code="demo.field2_en_US.label" default="field2 en US" /></span>
+					<span class="property-value" aria-labelledby="field2_en_US-label"><g:fieldValue bean="${demoInstance}" field="field2_en_US"/></span>
 				</li>
 				</g:if>
 			
 				<g:if test="${demoInstance?.name_fr_FR}">
 				<li class="fieldcontain">
 					<span id="name_fr_FR-label" class="property-label"><g:message code="demo.name_fr_FR.label" default="Namefr FR" /></span>
-					
-						<span class="property-value" aria-labelledby="name_fr_FR-label"><g:fieldValue bean="${demoInstance}" field="name_fr_FR"/></span>
-					
+					<span class="property-value" aria-labelledby="name_fr_FR-label"><g:fieldValue bean="${demoInstance}" field="name_fr_FR"/></span>
+				</li>
+				<li class="fieldcontain">
+					<span id="field1_fr_FR-label" class="property-label"><g:message code="demo.field1_fr_FR.label" default="field1 fr FR" /></span>
+					<span class="property-value" aria-labelledby="field1_fr_FR-label"><g:fieldValue bean="${demoInstance}" field="field1_fr_FR"/></span>
+				</li>
+				<li class="fieldcontain">
+					<span id="field2_fr_FR-label" class="property-label"><g:message code="demo.field2_fr_FR.label" default="field2 fr FR" /></span>
+					<span class="property-value" aria-labelledby="field2_fr_FR-label"><g:fieldValue bean="${demoInstance}" field="field2_fr_FR"/></span>
 				</li>
 				</g:if>
 			
 				<g:if test="${demoInstance?.name_es_ES}">
 				<li class="fieldcontain">
 					<span id="name_es_ES-label" class="property-label"><g:message code="demo.name_es_ES.label" default="Namees ES" /></span>
-					
-						<span class="property-value" aria-labelledby="name_es_ES-label"><g:fieldValue bean="${demoInstance}" field="name_es_ES"/></span>
-					
+					<span class="property-value" aria-labelledby="name_es_ES-label"><g:fieldValue bean="${demoInstance}" field="name_es_ES"/></span>
+				</li>
+				<li class="fieldcontain">
+					<span id="field1_es_ES-label" class="property-label"><g:message code="demo.field1_es_ES.label" default="field1 es ES" /></span>
+					<span class="property-value" aria-labelledby="field1_es_ES-label"><g:fieldValue bean="${demoInstance}" field="field1_es_ES"/></span>
+				</li>
+				<li class="fieldcontain">
+					<span id="field2_es_ES-label" class="property-label"><g:message code="demo.field2_es_ES.label" default="field2 es ES" /></span>
+					<span class="property-value" aria-labelledby="field2_es_ES-label"><g:fieldValue bean="${demoInstance}" field="field2_es_ES"/></span>
 				</li>
 				</g:if>
 			
