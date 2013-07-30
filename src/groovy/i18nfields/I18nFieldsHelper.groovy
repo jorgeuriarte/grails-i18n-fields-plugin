@@ -251,10 +251,13 @@ class I18nFieldsHelper implements Serializable {
 	 */
 	static def populateCache(object, locale) {
 		def origin = object[I18nFields.DATA][locale]
-		if(origin) return;
+		if(origin != null) return;
 		
 		def values = getRedisValues(object, locale)
-		if(!values) throw new Exception("Redis value not found.")
+		if(!values) {
+			object[I18nFields.DATA][locale] = []
+			throw new Exception("Redis value not found.")
+		}
 		
 		object[I18nFields.DATA][locale] = values
 	    values.each { value ->
