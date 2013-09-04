@@ -237,7 +237,6 @@ class ClassI18nalizator {
      * Adds a String Field to the class.
      */
 	private addI18nField(String name) {
-	    log.info("Adding '${name}' field to ${classNode.name}")
 		classNode.addProperty(name, Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), getGetterMethod(name), getSetterMethod(name))
 	}
 	
@@ -247,7 +246,7 @@ class ClassI18nalizator {
 	}
 	
 	private def getGetterMethod(field) {
-		return new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValue(this, '${field}')").pop();
+        new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValue(this, '${field[0..-7]}', '${field[-5..-1]}')").pop();
 	}	
 
 	private boolean hasConstraints(field) {
@@ -292,7 +291,6 @@ class ClassI18nalizator {
 				it.getExpression().getMethodAsString() != field
 			}
 			block.setCode(new BlockStatement(filtered, block.variableScope))
-			println "[i18nFields] Removed original constraint for '${field}'"
 		}
 	}
 
@@ -333,8 +331,9 @@ class ClassI18nalizator {
      * 
      */
 	private addProxyGetter(field) {
-		String methodName = GrailsClassUtils.getGetterName(field);
-		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getLocalizedValue(this, '${field}')").pop();
+	    String methodName = GrailsClassUtils.getGetterName(field);
+	    
+		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValue(this, '${field}')").pop();
 
 		def methodNode = new MethodNode(
 		    methodName, 
@@ -350,7 +349,7 @@ class ClassI18nalizator {
 	
 	private addLocalizedGetter(field) {
 		def methodName = GrailsClassUtils.getGetterName(field)
-		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getLocalizedValue(this, '${field}', locale)").pop();
+		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValue(this, '${field}', locale)").pop();
 		
 		def parameters = [new Parameter(ClassHelper.make(Locale, false), "locale")] as Parameter[]
 

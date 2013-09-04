@@ -55,76 +55,58 @@ class I18nFieldsHelper implements Serializable {
 		return result
 	}
 
-	def acceptedLocale(locale, object) {
-		def locales = object."${I18nFields.LOCALES}"
-		if (locales.containsKey(locale.language)
-			&& !locales[locale.language].contains(locale.country)) {
-			return new Locale(locale.language)
-		} else {
-			return locale
-		}
-	}
-
-	/**
-	 * Return the field value for the desired locale.
-	 * 
-	 * @param object domain class instance being used.
-	 * @param field field to retrieve, like name or description
-	 * @param locale the locale used to localize
-	 * @return
-	 */
-	static String getLocalizedValue( object, field, locale ) {
-	    def supported_locale = getSupportedLocale(locale)
-		return getValue(object, "${field}_${supported_locale}")
-	}
-	
-	/**
-	 * Return the field value for the current locale.
-	 * 
-	 * @param object domain class instance being used.
-	 * @param field field to retrieve, like name or description
-	 * @return
-	 */
-	static String getLocalizedValue( object, field ) {
-		def locale = i18nfields.I18nFieldsHelper.getSupportedLocale()
-		return getLocalizedValue(object, field, locale)
-	}
-	
-	/**
-	 * Return a field value even if it is stored in redis.
-	 * @param object domain class instance being used.
-	 * @param field field with locale to retrieve, like name_es_ES or description_es_ES
+    /**
+	 * Return a field value in the current locale or the default locale if the current
+	 * locale do not exists.
+	 *
+     * @param object domain class instance being used.
+     * @param field fieldname to retrieve, without locale
+     *
+     * @returns field value
+	 *
 	 */
 	static String getValue( object, field ) {
-	    assert object != null, "object to retrieve value should never be null"
-		
-		def locale = field[-5..-1]
-		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale)
-		
-		// If requested locale is in redis, load cache and then retrieve value
-		// if it is not, then use the field directly.
-		if(!isRedisLocale) return object.@"${field}"
-		else {
-			def result = ""
-			try {
-			    if (!object.@"${field}")
-				    populateCache(object, locale)
-				result = object.@"${field}"
-			}
-			catch(Exception e) {
-				log.warn("There was some problem retrieving values from Redis. (${locale}, ${object.class.name}, ${field})", e)
-				
-				// If something goes wrong, use default language if available, otherwise return empty string.
-				// default language should be a gorm language.
-				def grailsApplication = getSpringBean("grailsApplication")
-				def default_locale = grailsApplication.config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
-				if(default_locale) {
-					result = object.@"${field[0..-7]}_${default_locale}"
-				} 
-			}
-			return result;
-		}
-	}
+	    def locale = getSupportedLocale()
+	    def result = getValue(object, field, locale)
+	    if(!result) {
+			def grailsApplication = getSpringBean("grailsApplication")
+			def default_locale = grailsApplication.config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
+	        result = getValue(object, field, default_locale)
+	    }
+	    
+	    return result
+    }
+    
+    /**
+     * Return a field value without trying the default locale if there is a error
+     * In case of error with redis, returns empty
+     * In case of not supported locale, throws exception
+     *
+     * @param object domain class instance being used.
+     * @param field fieldname to retrieve, without locale
+     * @param field locale to retrieve
+     *
+     * @returns field value
+     */
+    static String getValue( object, field, locale ) {
+        assert object != null, "object to retrieve value should never be null"
+        assert locale != null, "the locale to retrieve is mandatory"
+        
+        locale = getSupportedLocale(locale) // use a near locale if locale do not exists.
+        
+        def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale)
+        if(!isRedisLocale) return object.@"${field}_${locale}"
+        
+        try {
+            populateCache(object, locale) // can throw exception
+        }
+        catch(Exception e) {
+            log.debug "Error retrieving redis value. Field ${field}, Locale: ${locale}"
+        }
+        
+        return object.@"${field}_${locale}"
+    }
+	
 	
 	/**
 	 * Set a field value, even if it is stored in redis.
