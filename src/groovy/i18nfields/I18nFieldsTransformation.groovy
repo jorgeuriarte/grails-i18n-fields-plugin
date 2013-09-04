@@ -20,12 +20,22 @@ public class I18nFieldsTransformation implements ASTTransformation {
 	void visit(ASTNode[] astNodes, SourceUnit sourceUnit) {
 		if (!isValidAstNodes(astNodes))
 			return
-		ClassI18nalizator internationalizator = new ClassI18nalizator(astNodes[1], locales(), redisLocales())
+			
+	    ClassI18nalizator internationalizator = new ClassI18nalizator(astNodes[1], locales(), redisLocales(), constraintsEnforce())
 		internationalizator.transformClass()
 	}
 
 	private isValidAstNodes(ASTNode[] astNodes) {
 		return astNodes != null && astNodes[0] != null && astNodes[1] != null && astNodes[0] instanceof AnnotationNode && astNodes[0].classNode?.name == I18nFields.class.getName() && astNodes[1] instanceof ClassNode
+	}
+	
+	private constraintsEnforce() {
+	    def constraints = true
+	    if( null != pluginConfig."${I18nFields.I18N_FIELDS}"?.enforceConstraintsOnRedisLocales) {
+	        constraints = pluginConfig."${I18nFields.I18N_FIELDS}"?.enforceConstraintsOnRedisLocales
+	    }
+	    
+	    return constraints
 	}
 
 	private locales() {

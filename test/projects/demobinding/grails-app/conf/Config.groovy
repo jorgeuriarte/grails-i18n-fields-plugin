@@ -102,6 +102,11 @@ i18nFields {
     // If can not fetch a locale from redis, which non-redis locale should we use
     defaultLocale = "es_ES"
     
+    // Copy the constraint on the field to the fields for each redis locale
+    // if true, the contraints are copied. If false no constraints are copied.
+    // Default: true
+    enforceConstraintsOnRedisLocales = false
+    
     // Config to access to redis.
     redisConfig {
         host = 'localhost'

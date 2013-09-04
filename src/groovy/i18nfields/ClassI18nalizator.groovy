@@ -34,6 +34,7 @@ class ClassI18nalizator {
 	def classNode
 	def locales
 	def redisLocales
+	def constraintsEnforce
 
     /**
      * Initialize a ClassI18nalizator
@@ -41,11 +42,13 @@ class ClassI18nalizator {
      * @param classNode Class being transformed
      * @param locales List of all knock locales
      * @param redisLocales List of locales stored in redis
+     * @param constraintsEnforce Copy constraints from field to redis locales
      */
-	ClassI18nalizator(ClassNode classNode, Collection<Locale> locales, Collection<Locale> redisLocales) {
+	ClassI18nalizator(ClassNode classNode, Collection<Locale> locales, Collection<Locale> redisLocales, constraintsEnforce) {
 		this.classNode = classNode
 		this.locales = locales
 		this.redisLocales = redisLocales
+		this.constraintsEnforce = constraintsEnforce
 	}
 
     /**
@@ -208,15 +211,26 @@ class ClassI18nalizator {
 		    
 		    // Create localized field and copy constraints.
 		    addI18nField(fieldName)
-		    if (!hasConstraints(fieldName) && hasConstraints(baseName))
-			    copyConstraints(baseName, fieldName)
+		    if (!hasConstraints(fieldName) && hasConstraints(baseName)) {
+		        if(!isRedisLocale(locale) || constraintsEnforce)
+    			    copyConstraints(baseName, fieldName)
+		    }
 		    
 		    // If it is a redisLocale, then make the field transient and bindable
-		    if(redisLocales.contains(locale)) {
+		    if(isRedisLocale(locale)) {
     	        makeFieldTransient(fieldName)
     	        makeFieldBindable(fieldName)
 		    }
 	    }
+	}
+	
+	/**
+	 * Check if a locale will be stored on redis
+	 * @param locale locale to check
+	 * @return true if redis locale, false otherwise.
+	 */
+	private isRedisLocale(locale) {
+	    return redisLocales.contains(locale)
 	}
 	
     /**
