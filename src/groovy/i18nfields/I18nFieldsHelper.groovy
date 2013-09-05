@@ -92,6 +92,7 @@ class I18nFieldsHelper implements Serializable {
         assert object != null, "object to retrieve value should never be null"
         assert locale != null, "the locale to retrieve is mandatory"
         
+        locale = locale.toString() // we need the locale as a string
         locale = getSupportedLocale(locale) // use a near locale if locale do not exists.
         
         def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale)
