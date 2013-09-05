@@ -31,7 +31,7 @@ public class I18nFieldsTransformation implements ASTTransformation {
 	
 	private constraintsEnforce() {
 	    def constraints = true
-	    if( null != pluginConfig."${I18nFields.I18N_FIELDS}"?.enforceConstraintsOnRedisLocales) {
+	    if( pluginConfig."${I18nFields.I18N_FIELDS}".containsKey("enforceConstraintsOnRedisLocales") ) {
 	        constraints = pluginConfig."${I18nFields.I18N_FIELDS}"?.enforceConstraintsOnRedisLocales
 	    }
 	    
