@@ -76,6 +76,11 @@
 					<span class="property-value" aria-labelledby="field2_es_ES-label"><g:fieldValue bean="${demoInstance}" field="field2_es_ES"/></span>
 				</li>
 				</g:if>
+				
+				<li class="fieldcontain">
+					<span id="version-label" class="property-label"><g:message code="version.label" default="Version" /></span>
+					<span class="property-value"><g:fieldValue bean="${demoInstance}" field="version"/></span>
+				</li>
 			
 			</ol>
 			<g:form>

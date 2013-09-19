@@ -34,6 +34,10 @@
 					<span id="field2_en_US-label" class="property-label">Field 2</span>
 					<span class="property-value" aria-labelledby="field2_en_US-label">${demoInstance.getField2(lang)}</span>
 				</li>
+				<li class="fieldcontain">
+					<span id="version-label" class="property-label">Version</span>
+					<span class="property-value" aria-labelledby="version-label">${demoInstance.version}</span>
+				</li>
 			</ol>
 			<g:form>
 				<fieldset class="buttons">

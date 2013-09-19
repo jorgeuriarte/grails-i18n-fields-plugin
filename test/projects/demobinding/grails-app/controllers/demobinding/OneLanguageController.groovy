@@ -48,7 +48,7 @@ class OneLanguageController {
             redirect(action: "list")
             return
         }
-/*
+
         if (version != null) {
             if (demoInstance.version > version) {
                 demoInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
@@ -58,9 +58,9 @@ class OneLanguageController {
                 return
             }
         }
-*/
+
         demoInstance.properties = params
-        if (!demoInstance.save(flush: true)) {
+        if (!demoInstance.saveLocale(RCU.getLocale(request))) {
             render(view: "edit", model: [demoInstance: demoInstance])
             return
         }

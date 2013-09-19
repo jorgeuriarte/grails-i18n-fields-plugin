@@ -54,6 +54,14 @@ class I18nFieldsHelper implements Serializable {
 		i18nfields.I18nFieldsHelper.setLocale(previousLocale)
 		return result
 	}
+	
+	/**
+	 * Helper method to allow saving just one locale directly to redis
+	 */
+	static saveLocale = { Locale locale ->
+		push(delegate, locale)
+		return true
+	}
 
     /**
 	 * Return a field value in the current locale or the default locale if the current
@@ -121,13 +129,15 @@ class I18nFieldsHelper implements Serializable {
 		def locale = field[-5..-1]
 		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale)
 
+		// Mark the locale as dirty
+		if(!object[I18nFields.DATA].dirty) object[I18nFields.DATA].dirty = [] as Set
+		object[I18nFields.DATA].dirty << locale
+		
+		if( !object.isDirty() ){ object.version = (!object.version ? null : object.version + 1) }
+
 		// If requested locale is in redis, save in cache and mark object as dirty
 		// if it is not, then use the field directly.
-		if(!isRedisLocale) object.@"${field}" = value
-		else {
-			object.@"${field}" = value
-			if( !object.isDirty() ){ object.version = (!object.version ? null : object.version + 1) }
-		}
+		object.@"${field}" = value
 	}
 	
 	/**
@@ -135,10 +145,18 @@ class I18nFieldsHelper implements Serializable {
 	 * @param locale locale to save
 	 */
 	static def push(object, locale) {
+		// if the locale is not dirty, there is no reason to push
+		def dirties = object[I18nFields.DATA].dirty
+		if(! (locale.toString() in object[I18nFields.DATA].dirty) ) {
+		    log.debug "Not pushing ${locale} because it is not dirty. (${object[I18nFields.DATA].dirty*.class.name})"
+	        return;
+		}
+		
 	    // get redis key to persist.
 	    def objectId =  object.id
 	    def className = object.class.simpleName.toLowerCase()
 		String keyName = "${locale}:${className}:${objectId}"
+		log.debug "Pushing locale ${locale} to Redis (${keyName})"
 
         // Gather values to persist.	    
 	    def values = [:]
@@ -154,6 +172,10 @@ class I18nFieldsHelper implements Serializable {
 		if (values) {
 		    try {
     		    RedisHolder.instance.hmset(keyName, values)
+    		    
+                // If the pushed locale were the last dirty locale, remove the dirty object state
+                dirties = dirties - locale.toString()
+                if(dirties == [] as Set)  object.version--
 		    }
 		    catch(Exception e) {
 		        log.error("Can not write in REDIS ! But it was already saved on mysql. Redis Locales were lost.", e);
@@ -165,7 +187,7 @@ class I18nFieldsHelper implements Serializable {
 	 * Save in redis all the locales
 	 */
 	static def pushAll(object) {
-	    def locales = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.LOCALES]
+		def locales = getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.LOCALES]
 	    locales.each { locale ->
 	        push(object, locale)
 	    }

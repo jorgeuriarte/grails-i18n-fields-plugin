@@ -50,6 +50,12 @@ class I18nFieldsGrailsPlugin {
 				theClass.metaClass.withLocale = I18nFieldsHelper.withLocale
 			}
 		}
+		['domain'].each {  
+			println "[i18nFields] Adding saveLocale method to ${it} classes"
+			application."${it}Classes".each { theClass ->
+				theClass.metaClass.saveLocale = I18nFieldsHelper.saveLocale
+			}
+		}
         i18nfields.I18nFieldsHelper.metaClass.getApplicationContext = { -> context }
 	}
 
