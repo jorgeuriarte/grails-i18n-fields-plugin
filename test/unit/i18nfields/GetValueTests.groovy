@@ -33,28 +33,32 @@ class GetValueTests {
 
 	@Test
 	void "return text in current locale"() {
-		systemLocale = new Locale("es", "ES"); assert I18nFieldsHelper.getValue(object, "name") == "spanish spain"
-		systemLocale = new Locale("pt", "PT"); assert I18nFieldsHelper.getValue(object, "name") == "portuguese portugal"
-		systemLocale = new Locale("pt", "BR"); assert I18nFieldsHelper.getValue(object, "name") == "portuguese brazil"
+		systemLocale = new Locale("es", "ES"); assert I18nFieldsHelper.getValueOrDefault(object, "name") == "spanish spain"
+		systemLocale = new Locale("pt", "PT"); assert I18nFieldsHelper.getValueOrDefault(object, "name") == "portuguese portugal"
+		systemLocale = new Locale("pt", "BR"); assert I18nFieldsHelper.getValueOrDefault(object, "name") == "portuguese brazil"
 	}
 
 	@Test
 	void "use similar language if exact culture do not exists"() {
 		systemLocale = new Locale("es", "AR"); 
-		assert I18nFieldsHelper.getValue(object, "name") == "spanish spain"
-		assert I18nFieldsHelper.getValue(object, "name", "es_AR") == "spanish spain"
+
+		assert I18nFieldsHelper.getValueOrDefault(object, "name") == "spanish spain"
+		assert I18nFieldsHelper.getValueOrDefault(object, "name", "es_AR") == "spanish spain"
 	}
 
 	@Test
 	void "use default locale if current locale is empty"() {
 		systemLocale = new Locale("pt", "BR"); 
 		object.name_pt_BR = ""
-		assert I18nFieldsHelper.getValue(object, "name") == "spanish spain"
+
+		assert I18nFieldsHelper.getValueOrDefault(object, "name") == "spanish spain"
+		assert I18nFieldsHelper.getValueOrDefault(object, "name", "pt_BR") == "spanish spain"
 	}
 
 	@Test
-	void "returns empty if asked for specific empty locale"() {
+	void "get value or empty"() {
 		object.name_pt_BR = ""
-		assert I18nFieldsHelper.getValue(object, "name", "pt_BR") == ""
+		assert I18nFieldsHelper.getValueOrEmpty(object, "name", "pt_BR") == ""
+		assert I18nFieldsHelper.getValueOrEmpty(object, "name", "pt_PT") == "portuguese portugal"
 	}
 }

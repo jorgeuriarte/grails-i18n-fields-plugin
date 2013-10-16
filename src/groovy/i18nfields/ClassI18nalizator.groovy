@@ -38,7 +38,7 @@ class ClassI18nalizator {
 
     /**
      * Initialize a ClassI18nalizator
-     
+     *
      * @param classNode Class being transformed
      * @param locales List of all knock locales
      * @param redisLocales List of locales stored in redis
@@ -246,7 +246,7 @@ class ClassI18nalizator {
 	}
 	
 	private def getGetterMethod(field) {
-        new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValue(this, '${field[0..-7]}', '${field[-5..-1]}')").pop();
+        new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValueOrDefault(this, '${field[0..-7]}', '${field[-5..-1]}')").pop();
 	}	
 
 	private boolean hasConstraints(field) {
@@ -333,7 +333,7 @@ class ClassI18nalizator {
 	private addProxyGetter(field) {
 	    String methodName = GrailsClassUtils.getGetterName(field);
 	    
-		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValue(this, '${field}')").pop();
+		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValueOrDefault(this, '${field}')").pop();
 
 		def methodNode = new MethodNode(
 		    methodName, 
@@ -349,7 +349,7 @@ class ClassI18nalizator {
 	
 	private addLocalizedGetter(field) {
 		def methodName = GrailsClassUtils.getGetterName(field)
-		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValue(this, '${field}', locale)").pop();
+		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValueOrDefault(this, '${field}', locale)").pop();
 		
 		def parameters = [new Parameter(ClassHelper.make(Locale, false), "locale")] as Parameter[]
 

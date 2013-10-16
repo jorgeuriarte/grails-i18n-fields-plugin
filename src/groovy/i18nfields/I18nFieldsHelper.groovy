@@ -40,7 +40,6 @@ class I18nFieldsHelper implements Serializable {
             def selected_locale = locales.find { candidato -> candidato.startsWith(lang) }
             
             if(!selected_locale) throw new Exception("Locale ${locale} not found!")
-            // log.warn("Locale ${locale} not found. Using ${selected_locale}")
             locale = selected_locale
         }
         
@@ -73,18 +72,31 @@ class I18nFieldsHelper implements Serializable {
      * @returns field value
 	 *
 	 */
-	static String getValue( object, field ) {
-	    def locale = getSupportedLocale()
-	    def result = getValue(object, field, locale)
+	static String getValueOrDefault( object, field ) {
+	    getValueOrDefault(object, field, getSupportedLocale())
+    }
+    
+    /**
+     * Return a field value in the specified locale or the default if empty
+     * In case of not supported locale, throws exception
+     *
+     * @param object domain class instance being used.
+     * @param field fieldname to retrieve, without locale
+     * @param locale locale to retrieve
+     *
+     * @returns field value
+     */
+    static String getValueOrDefault( object, field, locale ) {
+	    def result = getValueOrEmpty(object, field, locale)
 	    if(!result) {
 			def grailsApplication = getSpringBean("grailsApplication")
 			def default_locale = grailsApplication.config[I18nFields.I18N_FIELDS][I18nFields.DEFAULT_LOCALE]
-	        result = getValue(object, field, default_locale)
+	        result = getValueOrEmpty(object, field, default_locale)
 	    }
 	    
 	    return result
     }
-    
+
     /**
      * Return a field value without trying the default locale if there is a error
      * In case of error with redis, returns empty
@@ -92,11 +104,11 @@ class I18nFieldsHelper implements Serializable {
      *
      * @param object domain class instance being used.
      * @param field fieldname to retrieve, without locale
-     * @param field locale to retrieve
+     * @param locale locale to retrieve
      *
      * @returns field value
      */
-    static String getValue( object, field, locale ) {
+    static String getValueOrEmpty( object, field, locale ) {
         assert object != null, "object to retrieve value should never be null"
         assert locale != null, "the locale to retrieve is mandatory"
         
