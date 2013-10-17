@@ -173,11 +173,12 @@ class I18nFieldsHelper implements Serializable {
         // Gather values to persist.	    
 	    def values = [:]
 	    object[I18nFields.I18N_FIELDS].each { key ->
-	        if (object["${key}_${locale}"])
-	            if(object.hasProperty(I18nFields.I18N_FIELDS_RENAME)) 
-    	            values[object[I18nFields.I18N_FIELDS_RENAME][key]?:key] = object["${key}_${locale}"]
+	    	def value = object.@"${key}_${locale}"
+	        if (value != null)
+	            if(object.hasProperty(I18nFields.I18N_FIELDS_RENAME))
+    	            values[object[I18nFields.I18N_FIELDS_RENAME][key]?:key] = value
 	            else
-	                values[key] = object["${key}_${locale}"]
+	                values[key] = value
 	    }
 		
 		// If there is something to save... do it.

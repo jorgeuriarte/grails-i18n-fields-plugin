@@ -1,5 +1,6 @@
 
 <%@ page import="demobinding.Demo" %>
+<%@ page import="java.util.Locale" %>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -24,22 +25,33 @@
 			<table>
 				<thead>
 					<tr>
-					
-						<g:sortableColumn property="name" title="${message(code: 'demo.name.label', default: 'Name')}" />
-						<g:sortableColumn property="name_en_US" title="${message(code: 'demo.name_en_US.label', default: 'Nameen US')}" />
-						<g:sortableColumn property="name_fr_FR" title="${message(code: 'demo.name_fr_FR.label', default: 'Namefr FR')}" />
-						<g:sortableColumn property="name_es_ES" title="${message(code: 'demo.name_es_ES.label', default: 'Namees ES')}" />
-					
+					    <th rowspan="2" style="vertical-align: middle">ID</th>
+					    <th rowspan="2" style="vertical-align: middle">Contextual</th>
+					    <th colspan="3" style="text-align: center; border-left: 1px solid gray">Default</th>
+					    <th colspan="3" style="text-align: center; border-left: 1px solid gray"">Empty</th>
+					</tr>
+					</th>
+						<th style="border-left: 1px solid gray">English</th>
+						<th>French</th>
+						<th>Spanish</th>
+
+						<th style="border-left: 1px solid gray">English</th>
+						<th>French</th>
+						<th>Spanish</th>
 					</tr>
 				</thead>
 				<tbody>
 				<g:each in="${demoInstanceList}" status="i" var="demoInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-					
+					    <td><g:link action="show" id="${demoInstance.id}">${demoInstance.id}</g:link></td>
 						<td>${fieldValue(bean: demoInstance, field: "name")}</td>
-						<td><g:link action="show" id="${demoInstance.id}">${fieldValue(bean: demoInstance, field: "name_en_US")}</g:link></td>
+						<td style="border-left: 1px solid gray">${fieldValue(bean: demoInstance, field: "name_en_US")}</td>
 						<td>${fieldValue(bean: demoInstance, field: "name_fr_FR")}</td>
 						<td>${fieldValue(bean: demoInstance, field: "name_es_ES")}</td>
+
+						<td style="border-left: 1px solid gray">${demoInstance.getNameOrEmpty(new Locale("en", "US"))}</td>
+						<td>${demoInstance.getNameOrEmpty(new Locale("fr", "FR"))}</td>
+						<td>${demoInstance.getNameOrEmpty(new Locale("es", "ES"))}</td>
 					
 					</tr>
 				</g:each>
