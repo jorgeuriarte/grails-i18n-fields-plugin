@@ -145,7 +145,7 @@ class I18nFieldsHelper implements Serializable {
 		if(!object[I18nFields.DATA].dirty) object[I18nFields.DATA].dirty = [] as Set
 		object[I18nFields.DATA].dirty << locale
 		
-		if( object.version && !object.isDirty() ){ object.version = (!object.version ? null : object.version + 1) }
+//		if( object.version && !object.isDirty() ){ object.version = (!object.version ? null : object.version + 1) }
 
 		// If requested locale is in redis, save in cache and mark object as dirty
 		// if it is not, then use the field directly.
@@ -188,7 +188,7 @@ class I18nFieldsHelper implements Serializable {
     		    
                 // If the pushed locale were the last dirty locale, remove the dirty object state
                 dirties = dirties - locale.toString()
-                if(object.version && dirties == [] as Set)  object.version--
+//                if(object.version && dirties == [] as Set)  object.version--
 		    }
 		    catch(Exception e) {
 		        log.error("Can not write in REDIS ! But it was already saved on mysql. Redis Locales were lost.", e);
