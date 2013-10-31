@@ -110,6 +110,7 @@ i18nFields {
     // Config to access to redis.
     redisConfig {
         host = 'localhost'
-		port = 6379
+		    port = 6379
+        timeout = 2000
     }
 }
