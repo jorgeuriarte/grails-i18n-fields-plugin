@@ -22,11 +22,12 @@ grails.project.dependency.resolution = {
     dependencies {
         runtime 'mysql:mysql-connector-java:5.1.8'
         compile("net.sf.ehcache:ehcache-web:2.0.3") {
-               excludes "ehcache-core", "xml-apis" // ehcache-core is provided by Grails
+               excludes "xml-apis" // ehcache-core is provided by Grails
         }
         compile 'redis.clients:jedis:2.0.0'
     }
 	plugins {
+        runtime ":hibernate:3.6.10.10"
 		build (":release:2.2.1", ":rest-client-builder:1.0.3") { export = false }
 		compile (":springcache:1.3.1") { export = false }
 	}

@@ -9,7 +9,7 @@ import org.hibernate.event.PostInsertEvent
 class I18nFieldsGrailsPlugin {
     static final def log = Logger.getLogger(I18nFieldsGrailsPlugin)
 
-	def version = "0.8.1"
+	def version = "0.9-redis-SNAPSHOT"
 	def grailsVersion = "2.1.0 > *"
 	def pluginExcludes = [
 			"lib/*",
