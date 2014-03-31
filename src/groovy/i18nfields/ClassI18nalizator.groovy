@@ -210,7 +210,7 @@ class ClassI18nalizator {
 		    def fieldName = "${baseName}_${locale}";
 		    
 		    // Create localized field and copy constraints.
-		    addI18nField(fieldName)
+		    addI18nField(baseName, locale.toString())
 		    if (!hasConstraints(fieldName) && hasConstraints(baseName)) {
 		        if(!isRedisLocale(locale) || constraintsEnforce)
     			    copyConstraints(baseName, fieldName)
@@ -236,8 +236,10 @@ class ClassI18nalizator {
     /**
      * Adds a String Field to the class.
      */
-	private addI18nField(String name) {
-		classNode.addProperty(name, Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), getGetterMethod(name), getSetterMethod(name))
+	private addI18nField(String name, String locale) {
+		classNode.addProperty("${name}_${locale}", Modifier.PUBLIC, new ClassNode(String.class), new ConstantExpression(null), null, null)
+		addPropertyGetter(name, locale)
+		addPropertySetter(name, locale)
 	}
 	
 	private def getSetterMethod(field) {
@@ -325,15 +327,42 @@ class ClassI18nalizator {
 	private addGettersAndSetters(field) {
 		addProxyGetter(field)
 		addLocalizedGetter(field)
-		addLocalizedGetterEmpty(field)
+		addLocalizedGetterEmpty(field)		
 	}
 	
+	private addPropertyGetter(field, locale) {
+		String methodName = GrailsClassUtils.getGetterName("${field}_${locale}")
+		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValueOrDefault(this, '${field}')").pop();
+		def methodNode = new MethodNode(
+			methodName,
+			ACC_PUBLIC,
+			ClassHelper.STRING_TYPE,
+			Parameter.EMPTY_ARRAY,
+			ClassHelper.EMPTY_TYPE_ARRAY,
+			code
+		);
+		classNode.addMethod(methodNode)
+	}
+
+	private addPropertySetter(field, locale) {
+		String methodName = GrailsClassUtils.getSetterName("${field}_${locale}");
+		def params = new Parameter[1]
+		def methodNode = new MethodNode(
+			methodName,
+			ACC_PUBLIC,
+			ClassHelper.VOID_TYPE,
+			[new Parameter(ClassHelper.STRING_TYPE, "value")] as Parameter[],
+			ClassHelper.EMPTY_TYPE_ARRAY,
+			getSetterMethod(methodName)
+		);
+		classNode.addMethod(methodNode)
+	}
+
     /**
      * 
      */
 	private addProxyGetter(field) {
 	    String methodName = GrailsClassUtils.getGetterName(field);
-	    
 		def code = new AstBuilder().buildFromString("i18nfields.I18nFieldsHelper.getValueOrDefault(this, '${field}')").pop();
 
 		def methodNode = new MethodNode(
