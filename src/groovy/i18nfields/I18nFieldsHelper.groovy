@@ -1,7 +1,6 @@
 package i18nfields
 
 import groovy.util.logging.*
-import net.sf.ehcache.*
 
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
@@ -137,8 +136,8 @@ class I18nFieldsHelper implements Serializable {
 	 */
 	static void setValue( object, field, value ) {
 		assert object != null, "object to retrieve value should never be null"
-		println "AUIII: ${field}"
 		def locale = field[-5..-1]
+		def property = field[3..-6].toLowerCase()
 		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale)
 
 		// Mark the locale as dirty
@@ -149,7 +148,7 @@ class I18nFieldsHelper implements Serializable {
 
 		// If requested locale is in redis, save in cache and mark object as dirty
 		// if it is not, then use the field directly.
-		object.@"${field[3..-6].toLowerCase()}${locale}" = value
+		object.@"${property}${locale}" = value
 	}
 	
 	/**
