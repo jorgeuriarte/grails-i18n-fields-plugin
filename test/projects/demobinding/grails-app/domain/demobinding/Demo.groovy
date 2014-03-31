@@ -11,5 +11,5 @@ class Demo {
     }
     
     static i18nFields = ['name', 'field1', 'field2']
-    static i18nFieldsRename = ['name': 'nombre']
+    //static i18nFieldsRename = ['name': 'nombre']
 }
