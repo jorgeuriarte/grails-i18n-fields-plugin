@@ -6,6 +6,7 @@ class BootStrap {
         demo.name_es_ES = "Español"
         demo.name_fr_FR = "Frances"
         demo.name_en_US = "Ingles"
+        demo.demoDescription_es_ES = "una descripción..."
 
         demo.field1_es_ES = "Español1"
         demo.field1_fr_FR = "Frances1"

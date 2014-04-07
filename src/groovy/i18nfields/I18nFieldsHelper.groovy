@@ -134,10 +134,9 @@ class I18nFieldsHelper implements Serializable {
 	 * @param field fieldname to store.
 	 * @param value value to store.
 	 */
-	static void setValue( object, field, value ) {
+	static void setValue( object, getter, value ) {
 		assert object != null, "object to retrieve value should never be null"
-		def locale = field[-5..-1]
-		def property = field[3..-6].toLowerCase()
+		def (locale, field) = getter2LocaleAndField(getter)
 		def isRedisLocale =  getSpringBean("grailsApplication").config[I18nFields.I18N_FIELDS][I18nFields.REDIS_LOCALES].contains(locale)
 
 		// Mark the locale as dirty
@@ -148,9 +147,16 @@ class I18nFieldsHelper implements Serializable {
 
 		// If requested locale is in redis, save in cache and mark object as dirty
 		// if it is not, then use the field directly.
-		object.@"${property}${locale}" = value
+		object.@"${field}_${locale}" = value
 	}
 	
+	static def getter2LocaleAndField(getter) {
+		def locale = getter[-5..-1]
+		def property = getter[3..-7]
+		property = property[0].toLowerCase() + property.substring(1)
+		[locale, property]
+	}
+
 	/**
 	 * @param object domain class instance.
 	 * @param locale locale to save
